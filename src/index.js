@@ -3,180 +3,19 @@ import * as BABYLON from "@babylonjs/core";
 import "@babylonjs/core/Debug/debugLayer"; // Augments the scene with the debug methods
 import "@babylonjs/inspector"; // Injects a local ES6 version of the inspector to prevent automatically relying on the none compatible version
 
-import Scene from "./3dScene";
-// import Gateway from "../logic/GatewayLogic";
-// import LobbyState, { LobbyStates } from "../logic/LobbyStateLogic";
-// import EventManager from "../utilities/EventManager";
+/*   </head> 
+  <body>
+  <div id="wrapper"><p style="color:white;font-size:20px;padding:10px;text-align:center;">Tumbling Tower</p>
+  <p style="color:white;font-size:16px;padding:0px;text-align:center;">The object is to remove pieces without the tower falling.<br>
+  <p style="color:white;font-size:12px;padding:0px;text-align:center;">Click on either block end, to slide the block out.<br>
+  Hold down the mouse select button and move, to rotate.<br>
+  Middle mouse wheel to zoom.</p>
+    <div id="container">
+    </div>
+   </div>
+  </body>
+  </html> */
 
-//export default class Lobby extends React.Component {
-  /* constructor(props) {
-    super();
-
-    this.sceneLoadedHandler = props.sceneLoaded;
-    this.lobbyState$ = undefined;
-    this.data$ = undefined;
-    this.scene = undefined;
-    this.hlLayer = undefined;
-    this.camera = undefined;
-    this.materials = [];
-  } */
-
-/*   componentWillUnmount() {
-    // unsubscribe from all observables
-    if (this.lobbyState$) this.lobbyState$.unsubscribe();
-    if (this.data$) this.data$.unsubscribe();
-  } */
-
- /*  _updateSequin = (sequinInfo, region) => {
-    const sequin = this.scene.getMeshByName(sequinInfo.name);
-    sequin.isPickable = true;
-    sequin.metadata = {
-      id: sequinInfo.id,
-      name: sequinInfo.name,
-      region: region,
-    };
-    this.hlLayer.addMesh(sequin, BABYLON.Color3.Blue()); // Any color
-  }; */
-
-/*   _animateCamera = (trackName, speed = 1, reverse = false) => {
-    const track = this.scene.getMeshByName(trackName);
-    const keysLength = track.animations[0]._keys.length;
-    const start = 0;
-    const end = track.animations[0]._keys[keysLength - 1].frame;
-    const startFrame = reverse ? end : start;
-    const endFrame = reverse ? start : end;
-    this.camera.parent = track;
-    this.camera.fov = 0.5200; // fill more of camera frame with trees camera.fov = 0.5200;
-    return this.scene
-      .beginAnimation(track, startFrame, endFrame, false, speed)
-      .waitAsync();
-  }; */
-
-/*   _handleClickMain = () => {
-    const scene = this.scene;
-    let pickResult = scene.pick(scene.pointerX, scene.pointerY);
-
-    if (pickResult.hit) {
-      console.log("picked mesh: " + pickResult.pickedMesh.name);
-      let region = Gateway.getRegionFromMesh(pickResult.pickedMesh.name);
-      if (region) {
-        LobbyState.toRegionSelected(region);
-      }
-    }
-  }; */
-
-/*   _handleMouseMoveMain = () => {
-    this.hlLayer.removeAllMeshes();
-
-    let pickResult = this.scene.pick(this.scene.pointerX, this.scene.pointerY);
-
-    if (pickResult.hit) {
-      const r = Gateway.getRegionFromMesh(pickResult.pickedMesh.name);
-      if (r) {
-        r.meshes.forEach((m) =>
-          this.hlLayer.addMesh(m, BABYLON.Color3.Green())
-        );
-      }
-    }
-  }; */
-
-/*   _handleClickRegion = () => {
-    const scene = this.scene;
-    const region = LobbyState.current.newState.data.name;
-    let pickResult = scene.pick(scene.pointerX, scene.pointerY);
-
-    if (pickResult.hit) {
-      const mesh = pickResult.pickedMesh;
-      console.log("picked mesh: " + mesh);
-      // make sure a sequin was picked and the sequin is in the current region
-      if (mesh.name.indexOf("sequin") === -1 || mesh.name.indexOf(region) === -1)
-        return;
-
-      LobbyState.toSequinView(mesh.metadata);
-    }
-  }; */
-
-/* 
-  _handleStateChange = async (oldState, newState) => {
-    if (oldState) this._cleanUpOldState(oldState);
-    if (newState) await this._setUpNewState(oldState, newState);
-  }; */
-
-/*   _cleanUpOldState = (oldState) => {
-    switch (oldState.type) {
-      case LobbyStates.main:
-      case LobbyStates.regionEntered:
-        EventManager.removeAllListeners(window, "click");
-        EventManager.removeAllListeners(window, "mousemove");
-        break;
-
-      default:
-        break;
-    }
-  }; */
-
- /*  _setUpNewState = async (oldState, newState) => {
-    switch (newState.type) {
-      case LobbyStates.intro:
-        await this._animateCamera("introToWorldEmpty_2", 2.6);
-        LobbyState.toMainView();
-        break;
-
-      case LobbyStates.main:
-        if (this.data$) this.data$.unsubscribe();
-
-        if (oldState.type === LobbyStates.regionEntered) {
-          const region = oldState.data;
-          await this._animateCamera(region.trackName, 2, true);
-        }
-        EventManager.addListener(window, "click", this._handleClickMain);
-        EventManager.addListener(
-          window,
-          "mousemove",
-          this._handleMouseMoveMain
-        );
-        break;
-
-      case LobbyStates.regionSelected:
-        this.hlLayer.removeAllMeshes();
-        let regionSelected = newState.data;
-        if (oldState.type === LobbyStates.main) {
-          await this._animateCamera(regionSelected.trackName, 2);
-        }
-        LobbyState.toRegionEntered(regionSelected);
-        break;
-
-      case LobbyStates.regionEntered:
-        let regionEntered = newState.data;
-        this.data$ = Gateway.getRegion(regionEntered.name).stream.subscribe(
-          (sequins) => {
-            sequins.forEach((seq) => {
-              this._updateSequin(seq, regionEntered);
-            });
-          }
-        );
-        setTimeout(
-          () =>
-            EventManager.addListener(window, "click", this._handleClickRegion),
-          200
-        ); // slight pause prevents the sequin info modal from immediately popping back open
-        break;
-
-      case LobbyStates.sequin:
-        if (this.data$) this.data$.unsubscribe();
-        break;
-
-      case LobbyStates.sequinLink:
-        let regionLinked = newState.data.region;
-        await this._animateCamera(regionLinked.trackName, 2);
-        LobbyState.toSequinView(newState.data);
-        break;
-
-      default:
-        break;
-    }
-  }; */
-  
 
  // onSceneReady = async (e) => {
     let that = this;
