@@ -193,6 +193,7 @@
             //    var light1 = new BABYLON.PointLight("omni1", new BABYLON.Vector3(0, 50, 0), scene);
             var light2 = new BABYLON.PointLight("omni2", new BABYLON.Vector3(1.5, 1.0, 0), scene); // ground reflection (-29.683, 0, -29.683)
             //light2.setTarget(BABYLON.Vector3.Zero());
+            light2.position = new BABYLON.Vector3(0.0, 4.0, 0.0);
             light2.intensity = 0.8;// 0.6
 
             // Shadows
