@@ -16,12 +16,6 @@
     "@babylonjs/loaders": "^4.2.0",
     "@babylonjs/materials": "^4.2.0"
   },
-  "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts --max_old_space_size=8192 build",
-    "test": "react-scripts test",
-    "eject": "react-scripts eject"
-  },
   "browserslist": {
     "production": [
       ">0.2%",
