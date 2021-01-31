@@ -80,6 +80,25 @@
             height: 100%;
             touch-action: none;
         }
+
+        #viewerProgress {
+              width: 100%;
+              background-color: #ddd;
+            }
+            #viewerProgressBar {
+              width: 1%;
+              height: 30px;
+              color: #FFF;
+              background-color: mediumblue;
+              text-align: left;
+              padding-top: 5px;
+              overflow: hidden;
+              font-size: 100%;
+            }
+            .viewer-wrap {width:50%;height: 50vh;}
+            #viewer-overlay-image { z-index: 900; width: 100%;height: 100%;position: relative;top:0px;background-position: center;background-repeat: no-repeat;background-size: cover;}
+
+
     </style>
 </head>
 
@@ -109,6 +128,9 @@
         let distanceToMoveVertical = 0.0;
         let widerAmountX = 0.0;
         let widerAmountZ = 0.0;
+        let strength = 0.0;
+
+        
 
         //var createDefaultEngine = function () { return new BABYLON.Engine(canvas, true, { preserveDrawingBuffer: true, stencil: true,  disableWebGL2Support: false }); };
         var createDefaultEngine = function () { return new BABYLON.Engine(canvas, true, { preserveDrawingBuffer: true, stencil: true }); };
@@ -171,7 +193,7 @@
             // Shadows
             var shadowGenerator = new BABYLON.ShadowGenerator(4086, light); // 2048
 
-            scene.debugLayer.show();
+         //   scene.debugLayer.show();
             //        var hl = new BABYLON.HighlightLayer("hl", scene);
 
             var createDefaultPipeline = function () {
@@ -296,7 +318,7 @@
             // used as a source, never seen
             meshSource = BABYLON.MeshBuilder.CreateBox("meshSource", { width: 3, height: 2, depth: 8 }, scene);// { width: 3, height: 2, depth: 8 }
             var materialWood = new BABYLON.StandardMaterial("wood", scene);
-            materialWood.diffuseTexture = new BABYLON.Texture("textures/crate.jpg", scene); // crate.png
+            materialWood.diffuseTexture = new BABYLON.Texture("https://3dability.com/test/tower2/textures/crate.jpg", scene); // crate.png
             materialWood.emissiveColor = new BABYLON.Color3(0.5, 0.5, 0.5);
             meshSource.material = materialWood;
             meshSource.position.set(0.0, 0.0, 0.0); // (-10.0, 2.0, 0);
@@ -312,12 +334,12 @@
                 }
             }
 
-            let pickPulse = function (mesh) {
+            let pickPulse = function (mesh, strength) {
                 //Impulse Settings
                 var forward = new BABYLON.Vector3(0, 0, 1);
                 var backward = new BABYLON.Vector3(0, 0, -1);
                 var impulseDirection = new BABYLON.Vector3(0, 0, 1);
-                var impulseMagnitude = 10;
+                var impulseMagnitude = strength;
                 var contactLocalRefPoint = BABYLON.Vector3.Zero();
                 var re = /box/gi;
                 //Impulse Settings
@@ -720,8 +742,66 @@
               //  scene.enablePhysics(null, new BABYLON.OimoJSPlugin()); // better slide explodes easy
               //  scene.enablePhysics(null, new BABYLON.AmmoJSPlugin()); // even better slide, seems more solid 
             }
+ 
+            // GUI - //
+            let loadGUI = function()    {
+                var advancedTexture = BABYLON.GUI.AdvancedDynamicTexture.CreateFullscreenUI("UI");
+                advancedTexture.rootContainer.scaleX = window.devicePixelRatio;
+                advancedTexture.rootContainer.scaleY = window.devicePixelRatio;
+                // advancedTexture.layer.layerMask = 0x10000000;  
+                advancedTexture.renderScale = 3.0;
+                // -------------- GUI RIGHT PANEL ----------------------------------
 
+                var rightPanel = new BABYLON.GUI.StackPanel();
+                rightPanel.width = "1500px";
+                rightPanel.isVertical = true;
+                rightPanel.paddingRight = "20px";
+                rightPanel.horizontalAlignment = BABYLON.GUI.Control.HORIZONTAL_ALIGNMENT_RIGHT;
+                rightPanel.verticalAlignment = BABYLON.GUI.Control.VERTICAL_ALIGNMENT_CENTER;
 
+                advancedTexture.addControl(rightPanel);
+
+                // -------------- AMBIENT LIGHT ----------------------------------
+
+                var ambientLlightHeader = new BABYLON.GUI.TextBlock();
+                ambientLlightHeader.fontSize = 40;
+                ambientLlightHeader.outlineWidth = 10;
+                ambientLlightHeader.outlineColor = "black";
+                ambientLlightHeader.text = "Strength";
+                ambientLlightHeader.height = "60px";
+                ambientLlightHeader.color = "white";
+                rightPanel.addControl(ambientLlightHeader);
+
+                var ambientLlightSlider = new BABYLON.GUI.Slider();
+                ambientLlightSlider.borderColor = "black";
+                ambientLlightSlider.barOffset = 10;
+                ambientLlightSlider.thumbWidth = 30;
+                ambientLlightSlider.minimum = 2.5; // 2.5;
+                ambientLlightSlider.maximum = 3.239 * Math.PI;    // 3.239 * Math.PI;
+                ambientLlightSlider.value = 1;
+                ambientLlightSlider.height = "60px";
+                ambientLlightSlider.width = "200px";
+                ambientLlightSlider.color = "green";
+                ambientLlightSlider.background = "black";
+                ambientLlightSlider.onValueChangedObservable.add(function (ambientLightValue) {
+                    ambientLlightHeader.text = "Strength " + ambientLightValue;
+                    console.log("value to send " + ambientLightValue);
+                  //-  if (lightSun) {
+                  //-      lightSun.diffuse = new BABYLON.Color3(ambientLightValue, ambientLightValue, ambientLightValue);
+                        // change the Reflection.level (1.0) of the 'skyBox.material' lower for dark/black
+                        // 
+                        // console.log("value to send " + ambientLightValue);
+
+                //-        var skyBoxMaterial = scene.getMaterialByID("skyBox");
+                //-        skyBoxMaterial.reflectionTexture.level = ambientLightValue;
+                    }
+                //}
+                );
+                rightPanel.addControl(ambientLlightSlider);
+            }
+             // GUI - //
+
+         
             createDefaultPipeline();
             createMeshLoop();
             setActionManagers();
@@ -731,6 +811,7 @@
             createFacePoints(); // part of roll over vertices.
             setGroundImposter();
             setImposter();
+            loadGUI();
 
 
             canvas.addEventListener("pointermove", onPointerMove, false);
