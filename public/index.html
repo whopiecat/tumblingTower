@@ -128,8 +128,7 @@
         let distanceToMoveVertical = 0.0;
         let widerAmountX = 0.0;
         let widerAmountZ = 0.0;
-        let strength = 0.0;
-
+        let impulseMagnitude = 3.0;
         
 
         //var createDefaultEngine = function () { return new BABYLON.Engine(canvas, true, { preserveDrawingBuffer: true, stencil: true,  disableWebGL2Support: false }); };
@@ -334,12 +333,12 @@
                 }
             }
 
-            let pickPulse = function (mesh, strength) {
+            let pickPulse = function (mesh) {
                 //Impulse Settings
                 var forward = new BABYLON.Vector3(0, 0, 1);
                 var backward = new BABYLON.Vector3(0, 0, -1);
                 var impulseDirection = new BABYLON.Vector3(0, 0, 1);
-                var impulseMagnitude = strength;
+               // var impulseMagnitude = 10.0;
                 var contactLocalRefPoint = BABYLON.Vector3.Zero();
                 var re = /box/gi;
                 //Impulse Settings
@@ -783,9 +782,10 @@
                 ambientLlightSlider.width = "200px";
                 ambientLlightSlider.color = "green";
                 ambientLlightSlider.background = "black";
-                ambientLlightSlider.onValueChangedObservable.add(function (ambientLightValue) {
-                    ambientLlightHeader.text = "Strength " + ambientLightValue;
-                    console.log("value to send " + ambientLightValue);
+                ambientLlightSlider.onValueChangedObservable.add(function (sliderValue) {
+                    impulseMagnitude = sliderValue;
+                    ambientLlightHeader.text = "Strength " + impulseMagnitude;
+                   // console.log("from slider - impulseMagnitude " + impulseMagnitude);
                   //-  if (lightSun) {
                   //-      lightSun.diffuse = new BABYLON.Color3(ambientLightValue, ambientLightValue, ambientLightValue);
                         // change the Reflection.level (1.0) of the 'skyBox.material' lower for dark/black
@@ -798,6 +798,7 @@
                 //}
                 );
                 rightPanel.addControl(ambientLlightSlider);
+                 return impulseMagnitude;
             }
              // GUI - //
 
