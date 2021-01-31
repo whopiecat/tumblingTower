@@ -742,6 +742,10 @@
               //  scene.enablePhysics(null, new BABYLON.AmmoJSPlugin()); // even better slide, seems more solid 
             }
  
+
+            function float2int(value) {
+                return value | 0;
+            }
             // GUI - //
             let loadGUI = function()    {
                 var advancedTexture = BABYLON.GUI.AdvancedDynamicTexture.CreateFullscreenUI("UI");
@@ -762,42 +766,32 @@
 
                 // -------------- AMBIENT LIGHT ----------------------------------
 
-                var ambientLlightHeader = new BABYLON.GUI.TextBlock();
-                ambientLlightHeader.fontSize = 40;
-                ambientLlightHeader.outlineWidth = 10;
-                ambientLlightHeader.outlineColor = "black";
-                ambientLlightHeader.text = "Strength";
-                ambientLlightHeader.height = "60px";
-                ambientLlightHeader.color = "white";
-                rightPanel.addControl(ambientLlightHeader);
+                var impulseMagnitudeHeader = new BABYLON.GUI.TextBlock();
+                impulseMagnitudeHeader.fontSize = 40;
+                impulseMagnitudeHeader.outlineWidth = 10;
+                impulseMagnitudeHeader.outlineColor = "black";
+                impulseMagnitudeHeader.text = "Strength";
+                impulseMagnitudeHeader.height = "60px";
+                impulseMagnitudeHeader.color = "white";
+                rightPanel.addControl(impulseMagnitudeHeader);
 
-                var ambientLlightSlider = new BABYLON.GUI.Slider();
-                ambientLlightSlider.borderColor = "black";
-                ambientLlightSlider.barOffset = 10;
-                ambientLlightSlider.thumbWidth = 30;
-                ambientLlightSlider.minimum = 2.5; // 2.5;
-                ambientLlightSlider.maximum = 3.239 * Math.PI;    // 3.239 * Math.PI;
-                ambientLlightSlider.value = 1;
-                ambientLlightSlider.height = "60px";
-                ambientLlightSlider.width = "200px";
-                ambientLlightSlider.color = "green";
-                ambientLlightSlider.background = "black";
-                ambientLlightSlider.onValueChangedObservable.add(function (sliderValue) {
-                    impulseMagnitude = sliderValue;
-                    ambientLlightHeader.text = "Strength " + impulseMagnitude;
-                   // console.log("from slider - impulseMagnitude " + impulseMagnitude);
-                  //-  if (lightSun) {
-                  //-      lightSun.diffuse = new BABYLON.Color3(ambientLightValue, ambientLightValue, ambientLightValue);
-                        // change the Reflection.level (1.0) of the 'skyBox.material' lower for dark/black
-                        // 
-                        // console.log("value to send " + ambientLightValue);
-
-                //-        var skyBoxMaterial = scene.getMaterialByID("skyBox");
-                //-        skyBoxMaterial.reflectionTexture.level = ambientLightValue;
+                var impulseMagnitudeSlider = new BABYLON.GUI.Slider();
+                impulseMagnitudeSlider.borderColor = "black";
+                impulseMagnitudeSlider.barOffset = 10;
+                impulseMagnitudeSlider.thumbWidth = 30;
+                impulseMagnitudeSlider.minimum = 2.5; // 2.5;
+                impulseMagnitudeSlider.maximum = 3.239 * Math.PI;    // 3.239 * Math.PI;
+                impulseMagnitudeSlider.value = 1;
+                impulseMagnitudeSlider.height = "60px";
+                impulseMagnitudeSlider.width = "200px";
+                impulseMagnitudeSlider.color = "green";
+                impulseMagnitudeSlider.background = "black";
+                impulseMagnitudeSlider.onValueChangedObservable.add(function (impulseMagnitudeSliderValue) {
+                impulseMagnitude = impulseMagnitudeSliderValue;
+                impulseMagnitudeHeader.text = "Strength " + float2int(impulseMagnitude);
                     }
-                //}
                 );
-                rightPanel.addControl(ambientLlightSlider);
+                rightPanel.addControl(impulseMagnitudeSlider);
                  return impulseMagnitude;
             }
              // GUI - //
