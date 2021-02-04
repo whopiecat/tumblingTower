@@ -128,7 +128,7 @@
         let distanceToMoveVertical = 0.0;
         let widerAmountX = 0.0;
         let widerAmountZ = 0.0;
-        let impulseMagnitude = 10.0;
+        let impulseMagnitude = 0.0;
         
 
         //var createDefaultEngine = function () { return new BABYLON.Engine(canvas, true, { preserveDrawingBuffer: true, stencil: true,  disableWebGL2Support: false }); };
@@ -334,7 +334,7 @@
             // used as a source, never seen
             meshSource = BABYLON.MeshBuilder.CreateBox("meshSource", { width: 3, height: 2, depth: 8 }, scene);// { width: 3, height: 2, depth: 8 }
             var materialWood = new BABYLON.StandardMaterial("wood", scene);
-            materialWood.diffuseTexture = new BABYLON.Texture("textures/crate.jpg", scene); // crate.png
+            materialWood.diffuseTexture = new BABYLON.Texture("https://3dability.com/test/tower2/textures/crate.jpg", scene); // crate.png
             materialWood.emissiveColor = new BABYLON.Color3(0.5, 0.5, 0.5);
             meshSource.material = materialWood;
             meshSource.position.set(0.0, 0.0, 0.0); // (-10.0, 2.0, 0);
@@ -569,7 +569,7 @@
             let createMeshLoop = function (meshSource) {
                 // ---------------- EXTERNAL -------------------------------- //                
                 // MESH GOAL //
-                crateCountTotalGoal = 30; //28
+                crateCountTotalGoal = 60; //28
 
                ++ crateCountTotalGoal;
                 // MESH GOAL //
@@ -783,7 +783,7 @@
 
                 advancedTexture.addControl(rightPanel);
 
-                // -------------- impulseMagnitude ----------------------------------
+                // -------------- AMBIENT LIGHT ----------------------------------
 
                 var impulseMagnitudeHeader = new BABYLON.GUI.TextBlock();
                 impulseMagnitudeHeader.fontSize = 40;
@@ -800,7 +800,7 @@
                 impulseMagnitudeSlider.thumbWidth = 30;
                 impulseMagnitudeSlider.minimum = 2.5; // 2.5;
                 impulseMagnitudeSlider.maximum = 3.239 * Math.PI;    // 3.239 * Math.PI;
-                impulseMagnitudeSlider.value = 10;
+                impulseMagnitudeSlider.value = 8;
                 impulseMagnitudeSlider.height = "60px";
                 impulseMagnitudeSlider.width = "200px";
                 impulseMagnitudeSlider.color = "green";
@@ -813,58 +813,8 @@
                 rightPanel.addControl(impulseMagnitudeSlider);
                  return impulseMagnitude;
             }
-            // --------------- impulseMagnitude -------------------- //
              // GUI - //
 
-
-             let load3Dgui = function() {
-             // Create the 3D UI manager
-             var gui3Dmanager = new BABYLON.GUI.GUI3DManager(scene);
-        
-        // Create a horizontal stack panel
-        var gui3Dpanel = new BABYLON.GUI.StackPanel3D();
-        gui3Dpanel.margin = 0.09; // 0.02;
-      
-        gui3Dmanager.addControl(gui3Dpanel);
-        gui3Dpanel.position.x = 0.0;
-        gui3Dpanel.position.y = 1.5;
-        gui3Dpanel.position.z = 20.0;
-
-    
-        // Let's add some buttons!
-        var add3DButton = function() {
-            var button3D = new BABYLON.GUI.Button3D("orientation");
-            gui3Dpanel.addControl(button3D);
-            button3D.scaling = new BABYLON.Vector3(3, 3, 3);
-            button3D.onPointerUpObservable.add(function(){
-                gui3Dpanel.isVertical = !gui3Dpanel.isVertical;
-                button3D.content = text1;  
-            });
-            
-            var text1 = new BABYLON.GUI.TextBlock();
-            //if (gui3Dpanel.isVertical){
-            text1.text = "Paul ROCKS!";
-            text1.color = "green";
-            text1.fontSize = 26;
-           // }   
-
-            if (!gui3Dpanel.isVertical) {
-            //var text1 = new BABYLON.GUI.TextBlock();
-            text1.text = "new orientation";
-            text1.color = "white";
-            text1.fontSize = 24;
-            }
-
-            // button3D.content = text1;           
-        }  
-       
-        add3DButton();    
-        add3DButton();
-        add3DButton();
-         
-
-
-             }
          
             createDefaultPipeline();
             createMeshLoop();
@@ -876,10 +826,8 @@
             setGroundImposter();
             setImposter();
             createCatchMesh();
-          //  loadGUI();
-            load3Dgui();
+            loadGUI();
 
-// scene.debugLayer.show();
 
             canvas.addEventListener("pointermove", onPointerMove, false);
             return scene;
@@ -911,4 +859,4 @@
     </script>
 </body>
 
-</html>
+</html> -->
