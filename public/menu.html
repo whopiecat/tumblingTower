@@ -209,37 +209,61 @@
 
                 var advancedTexture = BABYLON.GUI.AdvancedDynamicTexture.CreateFullscreenUI("UImenu");
                 
-            var textGroup = new BABYLON.GUI.CheckboxGroup("Tumbling Towers");
+            var textGroup = new BABYLON.GUI.CheckboxGroup("Tumbling Tower");
+           // textGroup.get
           //  textGroup.TextBlock.color = "white";
         // var textGroup = new BABYLON.GUI.TextBlock();
            // textGroup.height = 0.30;
             //    var text1 = new BABYLON.GUI.TextBlock();
             //    text1.horizontalTextAlignment = BABYLON.GUI.Control.HORIZONTAL_ALIGNMENT_CENTER;
             //    text1.text = "Hello world";
-            //    text1.color = "#0394fc";
+                textGroup.color = "#0394fc";
             //    text1.fontSize = 14;
                // advancedTexture.addControl(text1); 
 
                 var panel = new BABYLON.GUI.SelectionPanel("panel");
                 panel.fontSize = 20;
-                panel.width = 0.20;
+                panel.width = 0.22;
                 panel.height = 0.60;//0.18;
                 panel.horizontalAlignment = BABYLON.GUI.Control.HORIZONTAL_ALIGNMENT_CENTER;
                 panel.verticalAlignment = BABYLON.GUI.Control.VERTICAL_ALIGNMENT_CENTER;
-                panel.color = "blue";
-                panel.background = "#0394fc";
-             //   panel.text = "Hello world";
+
+                    /* Change Color Scheme  */
+                    panel.color = "orange";// blue
+                    panel.background = "#336699"; // "#0394fc"
+                    panel.barColor = "orange"; // "#4F7DF2"
+                    panel.headerColor = "white";
+                    panel.buttonColor = "orange";
+                    panel.buttonBackground = "#684502"
+
+                    // Babylon.js playground reference  https://playground.babylonjs.com/#BXMTCD#2
+
                 advancedTexture.addControl(panel);
+
+
+
 
 
 
                 var transformGroup = new BABYLON.GUI.CheckboxGroup("Transformation");
                 transformGroup.addCheckbox("Small", );
                 transformGroup.addCheckbox("High", ); 
-               
+
+
+/* 
+                (method) BABYLON.GUI.RadioGroup.addRadio(label: string, func?: (n: number) => void, checked?: boolean): void
+                Adds a radio button as a control
+
+                @param - label is the label for the selector
+                @param - func is the function called when the Selector is checked
+                @param - checked is true when Selector is checked */
+
                 var colorGroup = new BABYLON.GUI.RadioGroup("Color");
                 colorGroup.addRadio("Blue",  true);
                 colorGroup.addRadio("Red", );
+
+
+
                 /*
                 (method) BABYLON.GUI.SliderGroup.addSlider(label: string, func?: (v: number) => void,
                  unit?: string, min?: number, max?: number, value?: number, onValueChange?: (v: number) => number): void
@@ -253,17 +277,15 @@
                  @param - value is the start value for the Slider between min and max
                  @param - onValueChange is the function used to format the value displayed, eg radians to degrees
                  */
-                var rotateGroup = new BABYLON.GUI.SliderGroup("How Tall", "S");
-                // rotateGroup.addSlider("Force", orientateY, "impulse", 0, 0.1 * Math.PI, 7, displayValue) // "degs"
-                // works great   rotateGroup.addSlider("Force",setImpulse," ", 1, 10, 1, displayValue)
-                rotateGroup.addSlider("Number of Block rows", setImpulse, " ", 1, 10, 1, displayValue)
+                var howTall = new BABYLON.GUI.SliderGroup("How Tall", "S");
+                howTall.addSlider("Number of Blocks total", setImpulse, " ", 6, 84, 30, displayValue)
 
                 // console.log("@@@@@@@@@@@ value @@@@@@@@@@@@ " + value);
                 // impulseMagnitude = impulseMagnitudeSliderValue;
-                panel.addGroup(textGroup);
+                panel.addGroup(textGroup);// title
                 panel.addGroup(transformGroup);
                 panel.addGroup(colorGroup);
-                panel.addGroup(rotateGroup);
+                panel.addGroup(howTall);
                 
             }
 

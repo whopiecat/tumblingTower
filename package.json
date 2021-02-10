@@ -1,6 +1,6 @@
 {
   "name": "tumbling-tower",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "description": "Interactive game to take turns removing blocks",
   "main": "index.js",
   "repository": "https://github.com/whopiecat/tumblingTower.git",

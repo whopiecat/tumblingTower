@@ -128,7 +128,7 @@
         let distanceToMoveVertical = 0.0;
         let widerAmountX = 0.0;
         let widerAmountZ = 0.0;
-        let impulseMagnitude = 1.0;
+        let impulseMagnitude = 3.0;
         
         // data /////////////////////////////////////
 
@@ -231,14 +231,14 @@
             var light = new BABYLON.DirectionalLight("dir02", new BABYLON.Vector3(0.2, -1, 0), scene);
             light.position = new BABYLON.Vector3(-76.104, -12.032, -96.969);
             light.direction = new BABYLON.Vector3(0.191, -0.953, 0.233);
-            light.intensity = 0.5;// 0.6
+            light.intensity = 0.2;// 0.6
 
 
             //    var light1 = new BABYLON.PointLight("omni1", new BABYLON.Vector3(0, 50, 0), scene);
             var light2 = new BABYLON.PointLight("omni2", new BABYLON.Vector3(1.5, 12.0, 0), scene); // ground reflection (-29.683, 0, -29.683) // 2/4/2021 (1.5, 1.0, 0)
             //light2.setTarget(BABYLON.Vector3.Zero());
             //light2.position = new BABYLON.Vector3(0.0, 1.0, 0.0);
-            light2.intensity = 0.3;// 0.6
+            light2.intensity = 0.5;// 0.6
 
             // Shadows
             var shadowGenerator = new BABYLON.ShadowGenerator(2048, light); // 2048
@@ -603,7 +603,7 @@
             let createMeshLoop = function (meshSource) {
                 // ---------------- EXTERNAL -------------------------------- //                
                 // MESH GOAL //
-                crateCountTotalGoal = 30; //28
+                crateCountTotalGoal = 84; //30 >> good start // 84
 
                ++ crateCountTotalGoal;
                 // MESH GOAL //
@@ -902,18 +902,29 @@
                 var displayValue = function (value) {
                    // return BABYLON.Tools.ToDegrees(value) | 0;
                    //return (value | 10);
-                   value = (Math.round(value * 10) / 10);
+                  // value = (Math.round(value * 10) / 10);
+                  value = (Math.floor(value));
                    return value;
                 }
 
                 var advancedTexture = BABYLON.GUI.AdvancedDynamicTexture.CreateFullscreenUI("UI");
+                
 
-                var selectBox = new BABYLON.GUI.SelectionPanel("sp");
-                selectBox.width = 0.25;
-                selectBox.height = 0.18;
-                selectBox.horizontalAlignment = BABYLON.GUI.Control.HORIZONTAL_ALIGNMENT_LEFT;
-                selectBox.verticalAlignment = BABYLON.GUI.Control.VERTICAL_ALIGNMENT_BOTTOM;
-                advancedTexture.addControl(selectBox); 
+                var panel = new BABYLON.GUI.SelectionPanel("panel");
+                panel.width = 0.15;// .width = 0.20;
+                panel.height = 0.18;
+                panel.horizontalAlignment = BABYLON.GUI.Control.HORIZONTAL_ALIGNMENT_LEFT;
+                panel.verticalAlignment = BABYLON.GUI.Control.VERTICAL_ALIGNMENT_CENTER;
+
+                /* Change Color Scheme  */
+                panel.color = "orange";// blue
+                panel.background = "#336699"; // "#0394fc"
+                panel.barColor = "orange"; // "#4F7DF2"
+                panel.headerColor = "white";
+                panel.buttonColor = "orange";
+                panel.buttonBackground = "#684502"
+
+                advancedTexture.addControl(panel); 
 
 /*                 var transformGroup = new BABYLON.GUI.CheckboxGroup("Transformation");
                 transformGroup.addCheckbox("Small", toSize);
@@ -938,13 +949,13 @@
                 var rotateGroup = new BABYLON.GUI.SliderGroup("Settings", "S");
                // rotateGroup.addSlider("Force", orientateY, "impulse", 0, 0.1 * Math.PI, 7, displayValue) // "degs"
                // works great   rotateGroup.addSlider("Force",setImpulse," ", 1, 10, 1, displayValue)
-                rotateGroup.addSlider("Force",setImpulse," ", 1, 10, 1, displayValue)
+                rotateGroup.addSlider("Force",setImpulse," ", 3, 10, 3, displayValue)
 
                // console.log("@@@@@@@@@@@ value @@@@@@@@@@@@ " + value);
                // impulseMagnitude = impulseMagnitudeSliderValue;
-             //   selectBox.addGroup(transformGroup);
-             //   selectBox.addGroup(colorGroup);
-                selectBox.addGroup(rotateGroup);
+             //   panel.addGroup(transformGroup);
+             //   panel.addGroup(colorGroup);
+                panel.addGroup(rotateGroup);
 
             }
 
@@ -1002,7 +1013,7 @@
 
              }
          
-            createDefaultPipeline();
+// -            createDefaultPipeline();
             createMeshLoop();
             setActionManagers();
          //   setShadow();
