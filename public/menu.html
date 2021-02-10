@@ -106,730 +106,170 @@
     <canvas id="renderCanvas"></canvas>
     <script>
         var canvas = document.getElementById("renderCanvas");
-        var engine = null;
-        var scene = null;
         var sceneToRender = null;
-        let rollOverMesh = null;
-        let distanceAboveCrates = 0.0; // init above ground
-        let crateOriginalRotationY = 0.0;
-        let distanceBetweenCratesX = 0.0; //side to side Horizional // was 3.03
-        let distanceBetweenCratesZ = 0.0;
-        let distanceSideToSide = 0.0;
-        let rotateAdjusted = 0;
-        let rotationBetaY = 0.0;
-        let meshSource;
-        let originalMesh;
-        let crateCountCurrent = 0;
-        let crateCountTotalGoal = 0;
-        let crateCountTotal = 0;
-        let rotateGoal = 0;
-        let isAngleRotationRequired = false;
-        let rotationY = 0.0; // beta rotation around y axis
-        let distanceToMoveVertical = 0.0;
-        let widerAmountX = 0.0;
-        let widerAmountZ = 0.0;
-        let impulseMagnitude = 0.0;
         
+        // data /////////////////////////////////////////
+
+/*     function saveData(user, pass) {
+        var account = {
+            User: user,
+            Pass: pass
+        };
+        //converts to JSON string the Object
+        account = JSON.stringify(account);
+        //creates a base-64 encoded ASCII string
+        account = btoa(account);
+        //save the encoded accout to web storage
+        localStorage.setItem('_account', account);
+    } */
+
+    function saveData(user, pass) {
+            var account = {
+                User: user,
+                Pass: pass
+            };
+            //converts to JSON string the Object
+            account = JSON.stringify(account);
+            //creates a base-64 encoded ASCII string
+            account = btoa(account);
+            //save the encoded accout to web storage
+            localStorage.setItem('_account', account);
+        }
+
+        // data /////////////////////////////////////////
+
+
+
 
         //var createDefaultEngine = function () { return new BABYLON.Engine(canvas, true, { preserveDrawingBuffer: true, stencil: true,  disableWebGL2Support: false }); };
         var createDefaultEngine = function () { return new BABYLON.Engine(canvas, true, { preserveDrawingBuffer: true, stencil: true }); };
 
-        let createGround = function () {
-            ground = BABYLON.MeshBuilder.CreateBox("ground", { width: 60, height: 1, depth: 60 }, scene);
-            // better marble ?
-            var marbleMaterial = new BABYLON.StandardMaterial("torus", scene);
-            var marbleTexture = new BABYLON.MarbleProceduralTexture("marble", 512, scene);
-            marbleTexture.numberOfTilesHeight = 4;
-            marbleTexture.numberOfTilesWidth = 4;
-            marbleMaterial.ambientTexture = marbleTexture;
-            marbleMaterial.backFaceCulling = false;
-            ground.material = marbleMaterial;
-            ground.receiveShadows = true;
-            ground.position.x = 0.5; // center base row on ground
-            ground.position.y = -1.6;
-            ground.position.z = -1.0;
-        }
-
-        let createCatchMesh = function () {
-            catchMesh = BABYLON.MeshBuilder.CreateBox("catchMesh", { width: 1000, height: 2, depth: 1000 }, scene);
-            // better marble ?
-            //var marbleMaterial = new BABYLON.StandardMaterial("torus", scene);
-            //var marbleTexture = new BABYLON.MarbleProceduralTexture("marble", 512, scene);
-            //marbleTexture.numberOfTilesHeight = 4;
-            //marbleTexture.numberOfTilesWidth = 4;
-            //marbleMaterial.ambientTexture = marbleTexture;
-            //marbleMaterial.backFaceCulling = false;
-            //ground.material = marbleMaterial;
-            // ground.receiveShadows = true;
-            catchMesh.position.x = 0.5; // center base row on ground
-            catchMesh.position.y = -30.0;
-            catchMesh.position.z = -1.0;
-            catchMesh.physicsImpostor = new BABYLON.PhysicsImpostor(catchMesh, BABYLON.PhysicsImpostor.BoxImpostor, { mass: 0.0, friction: 0.15, restitution: 0.1 }, scene);
-        }
-
-
 
         var createScene = async function () {
-            rollOverMesh = null;
-            // Setup basic scene
             var scene = new BABYLON.Scene(engine);
-            //  var camera = new BABYLON.ArcRotateCamera("camera", 5, 8.0, 20.0, BABYLON.Vector3.Zero(), scene); // odd shadows
-            //  var camera = new BABYLON.FreeCamera("camera1", new BABYLON.Vector3(0, 2, -8), scene);
+            scene.clearColor = new BABYLON.Color3( .5, .5, .5);
             var camera = new BABYLON.ArcRotateCamera("camera", 1 * Math.PI / 3, Math.PI / 2.5, 100, BABYLON.Vector3.Zero(), scene);
-            camera.setTarget(BABYLON.Vector3.Zero());
-            // camera.speed = 0.1;
-           // camera.Inertia = 0.0005;
-           // camera.inputs.attached.mousewheel.wheelPrecisionY = 100;
-
-            // limit horizional Angle and Zoom
-             var camerasBorderFunction = function () {
-                if (camera.beta < 0.1) camera.beta = 0.1; //Angle; // 0.1
-                else if (camera.beta > (Math.PI / 2) * 0.9) camera.beta = (Math.PI / 2) * 0.9;   //Zoom 
-                // - (camera.beta > (Math.PI / 2) * 0.9) camera.beta = (Math.PI / 2) * 0.9;
-                if (camera.radius > 150) camera.radius = 150; // 150
-                if (camera.radius < 20) camera.radius = 20; //30
-            };
-            scene.registerBeforeRender(camerasBorderFunction); 
-            camera.attachControl(canvas, true);
+             camera.setTarget(BABYLON.Vector3.Zero());
 
 
+             // GUI - //
+            var loadSelectionPanel = function () {
 
-            var light = new BABYLON.DirectionalLight("dir02", new BABYLON.Vector3(0.2, -1, 0), scene);
-            light.position = new BABYLON.Vector3(-76.104, -12.032, -96.969);
-            light.direction = new BABYLON.Vector3(0.191, -0.953, 0.233);
-            light.intensity = 0.6;// 0.6
+                /*                 var toSize = function (isChecked) {
+                                    if (isChecked) {
+                                        box.scaling = new BABYLON.Vector3(0.5, 0.5, 0.5);
+                                    }
+                                    else {
+                                        box.scaling = new BABYLON.Vector3(1, 1, 1);
+                                    }
+                                } */
 
+                /*                 var toPlace = function (isChecked) {
+                                    if (isChecked) {
+                                        box.position.y = 1.5;
+                                    }
+                                    else {
+                                        box.position.y = 0.5;
+                                    }
+                                } */
 
-            //    var light1 = new BABYLON.PointLight("omni1", new BABYLON.Vector3(0, 50, 0), scene);
-            var light2 = new BABYLON.PointLight("omni2", new BABYLON.Vector3(1.5, 1.0, 0), scene); // ground reflection (-29.683, 0, -29.683)
-            //light2.setTarget(BABYLON.Vector3.Zero());
-            light2.position = new BABYLON.Vector3(0.0, 1.0, 0.0);
-            light2.intensity = 0.8;// 0.6
+                /*        var setColor = function (but) {
+                           switch (but) {
+                               case 0:
+                                   box.material = blueMat;
+                                   break
+                               case 1:
+                                   box.material = redMat;
+                                   break
+                           }
+                       } */
 
-            // Shadows
-            var shadowGenerator = new BABYLON.ShadowGenerator(2048, light); // 2048
+                /* var boxSlider = BABYLON.MeshBuilder.CreateBox("boxSlider", {}, scene);
+                boxSlider.position.x = 8.0;
+                boxSlider.position.y = 1.0;
+                boxSlider.position.z = 2.5; */
 
-         //   scene.debugLayer.show();
-            //        var hl = new BABYLON.HighlightLayer("hl", scene);
+/*                 var orientateY = function (angle) {
+                    boxSlider.rotation.y = angle;
+                    boxSlider.rotation.x = angle;
+                } */
 
-            var createDefaultPipeline = function () {
-                var defaultPipeline = new BABYLON.DefaultRenderingPipeline("default", true, scene, [camera]);
-                var curve = new BABYLON.ColorCurves();
-                curve.globalHue = 200;
-                curve.globalDensity = 80;
-                curve.globalSaturation = 80;
-                curve.highlightsHue = 20;
-                curve.highlightsDensity = 80;
-                curve.highlightsSaturation = -80;
-                curve.shadowsHue = 2;
-                curve.shadowsDensity = 80; // 80
-                curve.shadowsSaturation = 40;
-                defaultPipeline.imageProcessing.colorCurves = curve;
-                defaultPipeline.depthOfField.focalLength = 300000;
-            }
-
-
-            let setActionManagers = function () {
-                for (var i = 0; i < scene.meshes.length; i++) {
-                    var mesh = scene.meshes[i];
-                    var re = /box/gi;
-                    var str = mesh.name;
-                    if (str.search(re) == -1) {
-                        // console.log("Does not contain sequin");
-                    } else {
-                        //console.log("Sequin named " + str + " is pickable " + mesh.isPickable);
-                        mesh.actionManager = new BABYLON.ActionManager(scene);
-                        mesh.actionManager.registerAction(new BABYLON.ExecuteCodeAction(BABYLON.ActionManager.OnPickUpTrigger, function () {
-                            pickPulse(mesh);
-                        }));
-                    }
+                var setImpulse = function (value) {
+                    impulseMagnitude = value;
+                    //console.log("setImpulse value " + value );
                 }
-            }
 
-            var sphere = [];
-
-            var createFacePoints = function () {
-                var cornerLocatorMaterial = new BABYLON.StandardMaterial("cornerLocatorMaterial", scene);
-                cornerLocatorMaterial.diffuseColor = new BABYLON.Color3(1, 0, 1);
-                cornerLocatorMaterial.specularColor = new BABYLON.Color3(0.5, 0.6, 0.87);
-                cornerLocatorMaterial.emissiveColor = new BABYLON.Color3(1, 1, 1);
-                cornerLocatorMaterial.ambientColor = new BABYLON.Color3(0.23, 0.98, 0.53);
-
-                sphere['1'] = BABYLON.Mesh.CreateSphere("cornerLocator1", 10, 0.8, scene);
-                sphere[1].material = cornerLocatorMaterial;
-                sphere['1'].isPickable = false;
-                sphere['2'] = sphere['1'].clone("cornerLocator2");
-                sphere['3'] = sphere['1'].clone("cornerLocator3");
-                sphere['4'] = sphere['1'].clone("cornerLocator4");
-            };
-
-            var getVertices = function (mesh) {
-                if (!mesh) { return; }
-                var piv = mesh.getPivotPoint();
-                var positions = mesh.getVerticesData(BABYLON.VertexBuffer.PositionKind);
-                if (!positions) { return; }
-                var numberOfPoints = positions.length / 3;
-
-                var level = false;
-                var map = [];
-                var poLoc = [];
-                var poGlob = [];
-                for (var i = 0; i < numberOfPoints; i++) {
-                    var p = new BABYLON.Vector3(positions[i * 3], positions[i * 3 + 1], positions[i * 3 + 2]);
-                    var found = false;
-                    for (var index = 0; index < map.length && !found; index++) {
-                        var array = map[index];
-                        var p0 = array[0];
-                        if (p0.equals(p) || (p0.subtract(p)).lengthSquared() < 0.01) {
-                            found = true;
-                        }
-                    }
-                    if (!found) {
-                        var array = [];
-                        poLoc.push(p.subtract(piv));
-                        poGlob.push(BABYLON.Vector3.TransformCoordinates(p, mesh.getWorldMatrix()));
-                        array.push(p);
-                        map.push(array);
-                    }
+                var displayValue = function (value) {
+                    // return BABYLON.Tools.ToDegrees(value) | 0;
+                    //return (value | 10);
+                    // value = (Math.round(value * 10) / 10); // (Math.round(value * 10) / 10);
+                    value = (Math.floor(value));
+                    return value;
                 }
-                return { local: poLoc, global: poGlob, pivot: piv };
-            }
 
-            var vertInfo;
-            var vertCount;
+                var advancedTexture = BABYLON.GUI.AdvancedDynamicTexture.CreateFullscreenUI("UImenu");
+                
+            var textGroup = new BABYLON.GUI.CheckboxGroup("Tumbling Towers");
+          //  textGroup.TextBlock.color = "white";
+        // var textGroup = new BABYLON.GUI.TextBlock();
+           // textGroup.height = 0.30;
+            //    var text1 = new BABYLON.GUI.TextBlock();
+            //    text1.horizontalTextAlignment = BABYLON.GUI.Control.HORIZONTAL_ALIGNMENT_CENTER;
+            //    text1.text = "Hello world";
+            //    text1.color = "#0394fc";
+            //    text1.fontSize = 14;
+               // advancedTexture.addControl(text1); 
 
-            var onPointerMove = function (ro) { // function (e)
-                var result = scene.pick(scene.pointerX, scene.pointerY, null, null, camera);
-                if (result.hit) {
-                    //   console.log(result);
-                    //  console.log("-- in  onPointerMove ------------- name :" + result.pickedMesh.name);
-                    rollOverMesh = result.pickedMesh;
-                    //  makeOverOut(rollOverMesh);
-                    var forward = new BABYLON.Vector3(0, 0, 1);
-                    var direction = rollOverMesh.getDirection(forward);
-                    direction.normalize();
-           //         console.log("-- in  onPointerMove ------------- direction :" + direction);
-                    //  console.log("-- in  onPointerMove -- " + result.pickedMesh.name);
-                    //makeOverOut(result.faceId);
-                    // subMeshFaceId: 9
-                    //subMeshId: 0
-                    vertInfo = getVertices(result.pickedMesh);
-          //          console.log("-- in  onPointerMove ------------- vertInfo " + vertInfo);
-                    vertCount = 0;
-                    for (var i = 0; i < vertInfo.global.length; i++) {
-                        if (
-                            Math.round(result.pickedPoint.x * 100) / 100 === vertInfo.global[i].x ||
-                            Math.round(result.pickedPoint.y * 100) / 100 === vertInfo.global[i].y ||
-                            Math.round(result.pickedPoint.z * 100) / 100 === vertInfo.global[i].z
-                        ) {
-                            vertCount++;
-                            if (sphere[vertCount]) {
-                                sphere[vertCount].position = vertInfo.global[i];
-                            }
-                        }
-                    }
-                }
-            };
-
-            // used as a source, never seen
-            meshSource = BABYLON.MeshBuilder.CreateBox("meshSource", { width: 3, height: 2, depth: 8 }, scene);// { width: 3, height: 2, depth: 8 }
-            var materialWood = new BABYLON.StandardMaterial("wood", scene);
-            materialWood.diffuseTexture = new BABYLON.Texture("https://3dability.com/test/tower2/textures/crate.jpg", scene); // crate.png
-            materialWood.emissiveColor = new BABYLON.Color3(0.5, 0.5, 0.5);
-            meshSource.material = materialWood;
-            meshSource.position.set(0.0, 0.0, 0.0); // (-10.0, 2.0, 0);
-            meshSource.rotation.x = 0; // alpha rotation around x axis
-            meshSource.rotation.y = 0.0;  // beta rotation around y axis
-            meshSource.rotation.z = 0; //gamma rotation around z axis
-            meshSource.isVisible = false;
-            meshSource.isPickable = true;
-
-            let setGroundImposter = function () {
-                if (scene.getMeshByName("ground") != null) {
-                    ground.physicsImpostor = new BABYLON.PhysicsImpostor(ground, BABYLON.PhysicsImpostor.BoxImpostor, { mass: 0, friction: 0.1, restitution: 0.2 }, scene);
-                }
-            }
-
-            let pickPulse = function (mesh) {
-                //Impulse Settings
-                var forward = new BABYLON.Vector3(0, 0, 1);
-                var backward = new BABYLON.Vector3(0, 0, -1);
-                var impulseDirection = new BABYLON.Vector3(0, 0, 1);
-               // var impulseMagnitude = 10.0;
-                var contactLocalRefPoint = BABYLON.Vector3.Zero();
-                var re = /box/gi;
-                //Impulse Settings
-                var resultPick = scene.pick(scene.pointerX, scene.pointerY, null, null, camera);
-                if (resultPick.hit) {
-                    //   console.log(result);
-                    // use code sample below to get direction Reference simpleRPGtest code example
-            //        console.log("in pickPulse --------------- name :" + (resultPick.pickedMesh));
-                    var direction = resultPick.pickedMesh.getDirection(forward);
-                    direction.normalize();
-           //         console.log("-- in  onPointerMove ------------- direction :" + direction);
-                    // console.log("--------------- face :" + resultPick.faceId);
-                    if (resultPick.faceId < 2) {
-         //               console.log(" -- result.faceId is LESS than 2");
-                        // impulseDirection = new BABYLON.Vector3(0, 0, 1);
-                        impulseDirection = direction;
-                    } else {
-           //             console.log(" -- result.faceId is MORE than 2");
-                        var direction = resultPick.pickedMesh.getDirection(backward);
-                        direction.normalize();
-                        // forward = new BABYLON.Vector3(0, 0, -1);
-                        impulseDirection = direction;
-                    }
-            //        console.log(" in pickPulse -- name -- " + (resultPick.pickedMesh));
-                    resultPick.pickedMesh.physicsImpostor.applyImpulse(impulseDirection.scale(impulseMagnitude), (resultPick.pickedMesh).getAbsolutePosition().add(contactLocalRefPoint));
-                }
-            }
-            // pickPulse notes 
-            // code example  var direction = person.getDirection(forward);
-            // direction.normalize();
+                var panel = new BABYLON.GUI.SelectionPanel("panel");
+                panel.fontSize = 20;
+                panel.width = 0.20;
+                panel.height = 0.60;//0.18;
+                panel.horizontalAlignment = BABYLON.GUI.Control.HORIZONTAL_ALIGNMENT_CENTER;
+                panel.verticalAlignment = BABYLON.GUI.Control.VERTICAL_ALIGNMENT_CENTER;
+                panel.color = "blue";
+                panel.background = "#0394fc";
+             //   panel.text = "Hello world";
+                advancedTexture.addControl(panel);
 
 
-            // Over/Out
-            var makeOverOut = function (rollOverMesh) {
-                rollOverMesh.actionManager.registerAction(new BABYLON.SetValueAction(BABYLON.ActionManager.OnPointerOutTrigger, rollOverMesh.material, "emissiveColor", rollOverMesh.material.emissiveColor));
-                rollOverMesh.actionManager.registerAction(new BABYLON.SetValueAction(BABYLON.ActionManager.OnPointerOverTrigger, rollOverMesh.material, "emissiveColor", BABYLON.Color3.Green()));
-            }
 
-            // scene's actions
-            scene.actionManager = new BABYLON.ActionManager(scene);
-
-            let setImposter = function (mesh) {
-                for (var i = 0; i < scene.meshes.length; i++) {
-                    var mesh = scene.meshes[i];
-                    var re = /box/gi;
-                    var str = mesh.name;
-                    if (str.search(re) == -1) {
-                        // console.log("Does not contain sequin");
-                    } else {
-                        //console.log("Sequin named " + str + " is pickable " + mesh.isPickable);
-                        mesh.physicsImpostor = new BABYLON.PhysicsImpostor(mesh, BABYLON.PhysicsImpostor.BoxImpostor, { mass: 0.3, friction: 0.15, restitution: 0.1 }, scene);
-                    }
-                }
-            }
-
-            let setShadow = function (mesh) {
-                for (var i = 0; i < scene.meshes.length; i++) {
-                    var mesh = scene.meshes[i];
-                    var re = /box/gi;
-                    var str = mesh.name;
-                    if (str.search(re) == -1) {
-                        // console.log("Does not contain sequin");
-                    } else {
-                        //console.log("Sequin named " + str + " is pickable " + mesh.isPickable);
-                        shadowGenerator.addShadowCaster(mesh);
-                    }
-                }shadowGenerator.getShadowMap().refreshRate = 0; // We need to compute it just once
-                    shadowGenerator.usePoissonSampling = true;
-            }
-
-            let adjustCreationParams = function () {
-// Zero (0) based index so only a 0,1,2 in a 3 Row tower
-
-        //        console.log(" ____ adjustCreationParams ___ called");
-                switch (rotateAdjusted) {
-                    // on a row change case is zeroed
-
-                    case 0:
-                //        console.log(" ***** 0: value found  ***** "); // center center
-                        if (rotationBetaY == 0.0) {
-                            distanceBetweenCratesX = 0.0;
-                            distanceBetweenCratesX = 0.0;  
-                            widerAmountX = 0.0;  //  widerAmountX = 0.0;
-
-                            distanceBetweenCratesZ = 0.0;
-                            distanceBetweenCratesZ = 0.0;
-                            widerAmountZ = 0.0;
-
-                        } else {
-                            distanceBetweenCratesX = 0.0;
-                            distanceBetweenCratesX = 0.0;  
-                            widerAmountX = 0.0;
-
-                            distanceBetweenCratesZ = 0.0;
-                            distanceBetweenCratesZ = 0.0;
-                             widerAmountZ = 0.0;
-                        }
-                        break;
-
-                    case 1:
-             //           console.log(" ***** 1: value found  ***** "); // left of center
-                        if (rotationBetaY == 0.0) {
-                            distanceBetweenCratesX = 0.0;
-                            distanceBetweenCratesX = 3.1;  //  3.1;
-                            widerAmountX = 0.0 * crateCountTotal; // 0.05 * crateCountTotal;
-
-
-                            distanceBetweenCratesZ = 0.0;
-                            distanceBetweenCratesZ = 0.0;
-                            
-                        } else {
-                            distanceBetweenCratesX = 0.0;
-                            distanceBetweenCratesX = 0.0;   
-                            
-
-                            distanceBetweenCratesZ = 0.0;
-                            distanceBetweenCratesZ = 3.1;  // 3.1;
-                            //  widerAmountZ = 1.0;
-                            widerAmountZ = 0.0 * crateCountTotal; // widerAmountZ = 0.05 * crateCountTotal;
-                        }
-                        break;
-
-                    case 2:
-              //          console.log(" ***** 2: value found  ***** ");   // right of center
-                        if (rotationBetaY == 0.0) {
-                            distanceBetweenCratesX = 0.0;
-                            distanceBetweenCratesX = -3.1;  // -3.1;
-                            // widerAmountX = -1.0;
-                            widerAmountX = -0.0 * crateCountTotal; // widerAmountX = -0.05 * crateCountTotal;
-
-
-                            distanceBetweenCratesZ = 0.0;
-                            distanceBetweenCratesZ = 0.0;
-                        } else {
-                            distanceBetweenCratesX = 0.0;
-                            distanceBetweenCratesX = 0.0;
-                        
-                            distanceBetweenCratesZ = 0.0;
-                            distanceBetweenCratesZ = -3.1;  // -3.1;
-                            // widerAmountZ = -1.0;
-                            widerAmountZ = -0.0 * crateCountTotal;  // widerAmountZ = -0.05 * crateCountTotal;
-                        }
-                        break;
-                    //#######################################################################//
-                    /*                     case 3:
-                                            console.log(" *****  3: value found ***** ");
-                                            if (rotationBetaY == 0.0) {
-                                                distanceBetweenCratesX = 0.0;
-                                                distanceBetweenCratesZ = 0.0;
-                                                distanceBetweenCratesX = 3.05;
-                                            } else {
-                                                distanceBetweenCratesX = 0.0;
-                                                distanceBetweenCratesZ = 0.0;
-                                                distanceBetweenCratesZ = 0.0;
-                                                distanceBetweenCratesX = 1.5;
-                                            }
-                                            break;
-                    
-                                        case 4:
-                                            console.log(" *****  4: value found ***** ");
-                                            if (rotationBetaY == 0.0) {
-                                                distanceBetweenCratesX = 0.0;
-                                                distanceBetweenCratesZ = 0.0;
-                                                distanceBetweenCratesX = 3.05;
-                                            } else {
-                                                distanceBetweenCratesX = 0.0;
-                                                distanceBetweenCratesZ = 0.0;
-                                                distanceBetweenCratesZ = 0.0;
-                                                distanceBetweenCratesX = 1.5;
-                                            }
-                                            break;
-                    
-                                        case 5:
-                                            console.log(" *****  5: value found ***** ");
-                                            if (rotationBetaY == 0.0) {
-                                                distanceBetweenCratesX = 0.0;
-                                                distanceBetweenCratesZ = 0.0;
-                                                distanceBetweenCratesX = 3.05;
-                                            } else {
-                                                distanceBetweenCratesX = 0.0;
-                                                distanceBetweenCratesZ = 0.0;
-                                                distanceBetweenCratesZ = 0.0;
-                                                distanceBetweenCratesX = 1.5;
-                                            }
-                                            break;
-                    
-                                        case 6:
-                                            console.log(" *****  6: value found ***** ");
-                                            if (rotationBetaY == 0.0) {
-                                                distanceBetweenCratesX = 0.0;
-                                                distanceBetweenCratesZ = 0.0;
-                                                distanceBetweenCratesX = 3.05;
-                                            } else {
-                                                distanceBetweenCratesX = 0.0;
-                                                distanceBetweenCratesZ = 0.0;
-                                                distanceBetweenCratesZ = 0.0;
-                                                distanceBetweenCratesX = 1.5;
-                                            }
-                                            break; */
-
-
-                    default:
-                        console.log(" ***** default: no value found ***** ");
-                        break;
-
-                        return distanceBetweenCratesZ;
-                }
-            }
-
-            // create crates
-            let createMeshLoop = function (meshSource) {
-                // ---------------- EXTERNAL -------------------------------- //                
-                // MESH GOAL //
-                crateCountTotalGoal = 60; //28
-
-               ++ crateCountTotalGoal;
-                // MESH GOAL //
-
-                rotateGoal = 3;  // how many before a horizional rotation
-              //  widerAmount = + i * 0.7;  //  (0.3)how much wider a horizional row is spaced times height
+                var transformGroup = new BABYLON.GUI.CheckboxGroup("Transformation");
+                transformGroup.addCheckbox("Small", );
+                transformGroup.addCheckbox("High", ); 
                
-                 // ---------------- EXTERNAL -------------------------------- //  
+                var colorGroup = new BABYLON.GUI.RadioGroup("Color");
+                colorGroup.addRadio("Blue",  true);
+                colorGroup.addRadio("Red", );
+                /*
+                (method) BABYLON.GUI.SliderGroup.addSlider(label: string, func?: (v: number) => void,
+                 unit?: string, min?: number, max?: number, value?: number, onValueChange?: (v: number) => number): void
+                   Adds a slider to the SelectorGroup
+                
+                 @param - label is the label for the SliderBar
+                 @param - func is the function called when the Slider moves
+                 @param - unit is a string describing the units used, eg degrees or metres
+                 @param - min is the minimum value for the Slider
+                 @param - max is the maximum value for the Slider
+                 @param - value is the start value for the Slider between min and max
+                 @param - onValueChange is the function used to format the value displayed, eg radians to degrees
+                 */
+                var rotateGroup = new BABYLON.GUI.SliderGroup("How Tall", "S");
+                // rotateGroup.addSlider("Force", orientateY, "impulse", 0, 0.1 * Math.PI, 7, displayValue) // "degs"
+                // works great   rotateGroup.addSlider("Force",setImpulse," ", 1, 10, 1, displayValue)
+                rotateGroup.addSlider("Number of Block rows", setImpulse, " ", 1, 10, 1, displayValue)
 
-
-
-                // ---------------- INTERNAL -------------------------------- //
-
-               // let isAngleRotationRequired = null;
-
-                // let distanceBetweenCrates = 3.03;
-
-                //  let distanceAboveCrates = 2.462; //above ground and vertical // 1.7 // 2.462;  ///ADJUST ON TRIGGER ///
-                //  let rotationBeta = 0.0; // beta rotation around y axis, how far to rotate around y axis ///ADJUST ON TRIGGER ///
-
-
-
-             //   console.log("base row start");
-             //   console.log("crate count total " + crateCountTotal);
-                // isAngleRotationRequired=false;
-
-                // let i = crateCountCurrent;
-                for (i = 1; i < crateCountTotalGoal; ++i) {
-
-                    
-               //    distanceNearFar = putNearFar(); //keeps centered in a line to camera left 
-              //  distanceBetweenCratesZ = distanceNearFar;//controls side by side
-                    buildCrate(originalMesh);
-
-
-                    if (rotateAdjusted === rotateGoal) { // >= makes stairs
-             //           console.log("A rotateAdjusted of " + rotateAdjusted + " is equal to a goal of " + rotateGoal);
-
-                        distanceToMoveVertical = putHeight();
-                        distanceAboveCrates = distanceToMoveVertical;
-                         // move up when goal reached height
-                         distanceToMoveVertical = 1.6;
-                          rotationBetaY = putRotationY();
-                        rotateAdjusted = 0;
-                    }
-
-                    
-                   // widerAmountX = widerAmountX + i * 0.02;
-
-                }
-               // console.log("base row end");
+                // console.log("@@@@@@@@@@@ value @@@@@@@@@@@@ " + value);
+                // impulseMagnitude = impulseMagnitudeSliderValue;
+                panel.addGroup(textGroup);
+                panel.addGroup(transformGroup);
+                panel.addGroup(colorGroup);
+                panel.addGroup(rotateGroup);
                 
             }
 
-            let buildCrate = function () {
-              //  console.log(" --------------------------------------------------------------------- ");
-             //   console.log(" ------ buildCrate -- rotationBetaY : " + rotationBetaY + "------------- ");
-             //   console.log(" --------------------------------------------------------------------- ");
+            scene.debugLayer.show();
+            loadSelectionPanel();
 
-                adjustCreationParams();
-              //  widerAmount = + i * 0.09;
-
-                originalMesh = meshSource;
-                var newInstance = originalMesh.createInstance("box" + i); // "crate"
-                // base row 1
-                newInstance.position.y = distanceAboveCrates; // 2.462 .. + i * 5; // above ground // distanceAboveCrates;
-               // newInstance.position.x = distanceBetweenCratesX;
-                newInstance.position.x = distanceBetweenCratesX + widerAmountX; // distance between crates 3.03; // + i *  // distanceBetweenCratesX; // side to side default camera view
-                newInstance.position.z = distanceBetweenCratesZ + widerAmountZ; // distance between crates 3.03; // + i * // distanceBetweenCratesZ;  // near Far
-                newInstance.rotation.x = 0.0; //alpha rotation around x axis
-                newInstance.rotation.y = rotationBetaY; //beta rotation around y axis  // rotationY;
-                newInstance.rotation.z = 0.0;  //gamma rotation around z axis
-                //shadowGenerator.addShadowCaster(newInstance);
-                inventory();
-            }
-
-            let inventory = function () {
-                ++crateCountCurrent;
-                ++crateCountTotal;
-                ++rotateAdjusted
-                console.log("crate count total " + crateCountTotal);
-             //   console.log("crate count Current " + crateCountCurrent);
-            //    console.log("The rotateAdjusted value is " + rotateAdjusted);
-            //    console.log("The rotationBetaY value is " + rotationBetaY);
-            }
-            
-            let determineAngleXRotationPerRow = function () {
-         //       console.log(" determineAngleXRotationPerRow called ");
-                if (rotateAdjusted === rotateGoal) {
-         //           console.log("---- Logic test-runs at row count of : " + rotateGoal + " crates wide ----");
-                    //   console.log("-rotateAdjusted of " + rotateAdjusted + " is less than or equal to " + rotateGoal);
-                    // isAngleRotationRequired=false;
-        //            console.log("true");
-                    isAngleRotationRequired = true;
-         //           console.log("---- :  in isAngleRotationRequired : " + isAngleRotationRequired);
-                    //rotationBetaY = 1.6;
-                } else {
-         //           console.log("false");
-                    isAngleRotationRequired = false;
-         //           console.log("---- : in isAngleRotationRequired : " + isAngleRotationRequired);
-                    // rotationBetaY = 0.0;
-                } return isAngleRotationRequired;
-            }
-
-            let putRotationY = function () {
-         //       console.log("----- putRotationBetaY called -----");
-                if (rotateAdjusted === rotateGoal) {
-                // rotationBetaY = 1.6;
-                if (rotationBetaY == 1.6) {
-                     rotationBetaY = crateOriginalRotationY;
-                } else {
-                      rotationBetaY = 1.6;
-                }
-                //console.log("----- rotationBetaY -----" + rotationBetaY);
-                return rotationBetaY;
-            }
-        }
-
-            let putHeight = function () {
-                // -- WORKING FINE MAKING 1 CRATE UP MOVES PER ROW WIDTH --//
-            //    console.log("----- putHeight called -----");
-                // adjust height values * i up
-                distanceToMoveVertical = + i * 0.7;
-            //    console.log("----- distanceToMoveVertical -----" + distanceToMoveVertical);
-                // distanceAboveCrates = distanceAboveCrates = + i * 3.0;
-                // console.log("----- height after -----" + distanceAboveCrates);
-                return distanceToMoveVertical;
-            }
-
-            let putNearFar = function () {
-           //     console.log("----- putNearFar called -----");
-                if (rotateAdjusted < rotateGoal) {
-                    distanceBetweenCratesZ = 0.0;
-                } else {
-                    distanceBetweenCratesZ = 3.03;
-                }
-             //   console.log("----- distanceBetweenCratesZ -----" + distanceBetweenCratesZ);
-                return distanceBetweenCratesZ;
-            }
-
-            let putNearFarAngle = function () {
-          //      console.log("----- putNearFarAngle called -----");
-                if (rotationBetaY ==  1.6 ) {
-                    distanceBetweenCratesZAngle = 8.03;
-                    distanceSideToSide = 8.0;
-                } else {
-                    distanceBetweenCratesZAngle = 0.0;
-                }
-                distanceBetweenCratesZ = distanceBetweenCratesZAngle;
-        //        console.log("----- distanceBetweenCratesZ -----" + distanceBetweenCratesZ);
-                return distanceBetweenCratesZ;
-            }
-
-
-
-
-            let putSideToSide = function () {
-         //       console.log("----- putSideToSide called -----");
-                if (rotateAdjusted === rotateGoal) {
-                    switch (rotateAdjusted) {
-                        case 0:
-                        distanceSideToSide = 0.0;
-                            break;
-                        case 1:
-                        distanceSideToSide = 0.0;
-                            break;
-                        case 2:
-                        distanceSideToSide = 0.0;
-                            break;
-                        case 3:
-                        distanceSideToSide = 0.0;
-                            break;
-                        default:
-                            break;
-              //              console.log("----- distanceSideToSide -----" + distanceSideToSide);
-                            return distanceSideToSide;
-                    }
-                }
-            }
-
-            //rotateAdjusted = 0;
-
-
-            //////// PHYSICS //////////
-            let setPhysics = function () {
-               scene.enablePhysics(null, new BABYLON.CannonJSPlugin()); // works some jitter
-              //  scene.enablePhysics(null, new BABYLON.OimoJSPlugin()); // better slide explodes easy
-              //  scene.enablePhysics(null, new BABYLON.AmmoJSPlugin()); // even better slide, seems more solid 
-            }
- 
-
-            function float2int(value) {
-                return value | 0;
-            }
-            // GUI - //
-            let loadGUI = function()    {
-                var advancedTexture = BABYLON.GUI.AdvancedDynamicTexture.CreateFullscreenUI("UI");
-                advancedTexture.layer.layerMask = 1; // try and move off layer with physics // layerMask = 2;
-                advancedTexture.rootContainer.scaleX = window.devicePixelRatio;
-                advancedTexture.rootContainer.scaleY = window.devicePixelRatio;
-               // advancedTexture.layer.layerMask = 0x10000000;   // not visible
-                advancedTexture.renderScale = 3.0;
-                // -------------- GUI RIGHT PANEL ----------------------------------
-
-                var rightPanel = new BABYLON.GUI.StackPanel();
-                rightPanel.width = "1500px";
-                rightPanel.isVertical = true;
-                rightPanel.paddingRight = "20px";
-                rightPanel.horizontalAlignment = BABYLON.GUI.Control.HORIZONTAL_ALIGNMENT_RIGHT;
-                rightPanel.verticalAlignment = BABYLON.GUI.Control.VERTICAL_ALIGNMENT_CENTER;
-
-                advancedTexture.addControl(rightPanel);
-
-                // -------------- AMBIENT LIGHT ----------------------------------
-
-                var impulseMagnitudeHeader = new BABYLON.GUI.TextBlock();
-                impulseMagnitudeHeader.fontSize = 40;
-                impulseMagnitudeHeader.outlineWidth = 10;
-                impulseMagnitudeHeader.outlineColor = "black";
-                impulseMagnitudeHeader.text = "Strength";
-                impulseMagnitudeHeader.height = "60px";
-                impulseMagnitudeHeader.color = "white";
-                rightPanel.addControl(impulseMagnitudeHeader);
-
-                var impulseMagnitudeSlider = new BABYLON.GUI.Slider();
-                impulseMagnitudeSlider.borderColor = "black";
-                impulseMagnitudeSlider.barOffset = 10;
-                impulseMagnitudeSlider.thumbWidth = 30;
-                impulseMagnitudeSlider.minimum = 2.5; // 2.5;
-                impulseMagnitudeSlider.maximum = 3.239 * Math.PI;    // 3.239 * Math.PI;
-                impulseMagnitudeSlider.value = 8;
-                impulseMagnitudeSlider.height = "60px";
-                impulseMagnitudeSlider.width = "200px";
-                impulseMagnitudeSlider.color = "green";
-                impulseMagnitudeSlider.background = "black";
-                impulseMagnitudeSlider.onValueChangedObservable.add(function (impulseMagnitudeSliderValue) {
-                impulseMagnitude = impulseMagnitudeSliderValue;
-                impulseMagnitudeHeader.text = "Strength " + float2int(impulseMagnitude);
-                    }
-                );
-                rightPanel.addControl(impulseMagnitudeSlider);
-                 return impulseMagnitude;
-            }
-             // GUI - //
-
-         
-            createDefaultPipeline();
-            createMeshLoop();
-            setActionManagers();
-      //      setShadow();
-            setPhysics();
-            createGround();
-            createFacePoints(); // part of roll over vertices.
-            setGroundImposter();
-            setImposter();
-            createCatchMesh();
-            loadGUI();
-
-
-            canvas.addEventListener("pointermove", onPointerMove, false);
             return scene;
         };
 

@@ -128,8 +128,38 @@
         let distanceToMoveVertical = 0.0;
         let widerAmountX = 0.0;
         let widerAmountZ = 0.0;
-        let impulseMagnitude = 10.0;
+        let impulseMagnitude = 1.0;
         
+        // data /////////////////////////////////////
+
+/*     function loadData() {
+        var account = localStorage.getItem('_account');
+        if (!account) return false;
+        localStorage.removeItem('_account');
+        //decodes a string data encoded using base-64
+        account = atob(account);
+        //parses to Object the JSON string
+        account = JSON.parse(account);
+        //do what you need with the Object
+        fillFields(account.User, account.Pass);
+        return true;
+    } */
+
+    
+    function loadData() {
+        var account = localStorage.getItem('_account');
+        if (!account) return false;
+        localStorage.removeItem('_account');
+        //decodes a string data encoded using base-64
+        account = atob(account);
+        //parses to Object the JSON string
+        account = JSON.parse(account);
+        //do what you need with the Object
+        fillFields(account.User, account.Pass);
+        return true;
+    }
+
+        // data /////////////////////////////////////////
 
         //var createDefaultEngine = function () { return new BABYLON.Engine(canvas, true, { preserveDrawingBuffer: true, stencil: true,  disableWebGL2Support: false }); };
         var createDefaultEngine = function () { return new BABYLON.Engine(canvas, true, { preserveDrawingBuffer: true, stencil: true }); };
@@ -161,6 +191,9 @@
             //marbleMaterial.backFaceCulling = false;
             //ground.material = marbleMaterial;
             // ground.receiveShadows = true;
+            var blueMat = new BABYLON.StandardMaterial("blue", scene);
+            blueMat.emissiveColor = new BABYLON.Color3(0,0,1);
+            catchMesh.material = blueMat;
             catchMesh.position.x = 0.5; // center base row on ground
             catchMesh.position.y = -30.0;
             catchMesh.position.z = -1.0;
@@ -173,6 +206,7 @@
             rollOverMesh = null;
             // Setup basic scene
             var scene = new BABYLON.Scene(engine);
+            scene.clearColor = new BABYLON.Color3( .5, .5, .5);
             //  var camera = new BABYLON.ArcRotateCamera("camera", 5, 8.0, 20.0, BABYLON.Vector3.Zero(), scene); // odd shadows
             //  var camera = new BABYLON.FreeCamera("camera1", new BABYLON.Vector3(0, 2, -8), scene);
             var camera = new BABYLON.ArcRotateCamera("camera", 1 * Math.PI / 3, Math.PI / 2.5, 100, BABYLON.Vector3.Zero(), scene);
@@ -197,14 +231,14 @@
             var light = new BABYLON.DirectionalLight("dir02", new BABYLON.Vector3(0.2, -1, 0), scene);
             light.position = new BABYLON.Vector3(-76.104, -12.032, -96.969);
             light.direction = new BABYLON.Vector3(0.191, -0.953, 0.233);
-            light.intensity = 0.6;// 0.6
+            light.intensity = 0.5;// 0.6
 
 
             //    var light1 = new BABYLON.PointLight("omni1", new BABYLON.Vector3(0, 50, 0), scene);
-            var light2 = new BABYLON.PointLight("omni2", new BABYLON.Vector3(1.5, 1.0, 0), scene); // ground reflection (-29.683, 0, -29.683)
+            var light2 = new BABYLON.PointLight("omni2", new BABYLON.Vector3(1.5, 12.0, 0), scene); // ground reflection (-29.683, 0, -29.683) // 2/4/2021 (1.5, 1.0, 0)
             //light2.setTarget(BABYLON.Vector3.Zero());
-            light2.position = new BABYLON.Vector3(0.0, 1.0, 0.0);
-            light2.intensity = 0.8;// 0.6
+            //light2.position = new BABYLON.Vector3(0.0, 1.0, 0.0);
+            light2.intensity = 0.3;// 0.6
 
             // Shadows
             var shadowGenerator = new BABYLON.ShadowGenerator(2048, light); // 2048
@@ -772,6 +806,7 @@
                 advancedTexture.rootContainer.scaleY = window.devicePixelRatio;
                // advancedTexture.layer.layerMask = 0x10000000;   // not visible
                 advancedTexture.renderScale = 3.0;
+
                 // -------------- GUI RIGHT PANEL ----------------------------------
 
                 var rightPanel = new BABYLON.GUI.StackPanel();
@@ -812,18 +847,119 @@
                 );
                 rightPanel.addControl(impulseMagnitudeSlider);
                  return impulseMagnitude;
+
+                 
             }
             // --------------- impulseMagnitude -------------------- //
              // GUI - //
+
+            var loadSelectionPanel = function () {
+                
+/*                 var toSize = function (isChecked) {
+                    if (isChecked) {
+                        box.scaling = new BABYLON.Vector3(0.5, 0.5, 0.5);
+                    }
+                    else {
+                        box.scaling = new BABYLON.Vector3(1, 1, 1);
+                    }
+                } */
+
+/*                 var toPlace = function (isChecked) {
+                    if (isChecked) {
+                        box.position.y = 1.5;
+                    }
+                    else {
+                        box.position.y = 0.5;
+                    }
+                } */
+
+         /*        var setColor = function (but) {
+                    switch (but) {
+                        case 0:
+                            box.material = blueMat;
+                            break
+                        case 1:
+                            box.material = redMat;
+                            break
+                    }
+                } */
+
+/*                 var boxSlider = BABYLON.MeshBuilder.CreateBox("boxSlider", {}, scene);
+                boxSlider.position.x = 8.0;
+                boxSlider.position.y = 1.0;
+                boxSlider.position.z = 2.5; */
+
+                var orientateY = function (angle) {
+                    boxSlider.rotation.y = angle;
+                    boxSlider.rotation.x = angle;
+                }
+
+                var setImpulse = function (value) {
+                    impulseMagnitude = value;
+                   //console.log("setImpulse value " + value );
+                }
+
+                var displayValue = function (value) {
+                   // return BABYLON.Tools.ToDegrees(value) | 0;
+                   //return (value | 10);
+                   value = (Math.round(value * 10) / 10);
+                   return value;
+                }
+
+                var advancedTexture = BABYLON.GUI.AdvancedDynamicTexture.CreateFullscreenUI("UI");
+
+                var selectBox = new BABYLON.GUI.SelectionPanel("sp");
+                selectBox.width = 0.25;
+                selectBox.height = 0.18;
+                selectBox.horizontalAlignment = BABYLON.GUI.Control.HORIZONTAL_ALIGNMENT_LEFT;
+                selectBox.verticalAlignment = BABYLON.GUI.Control.VERTICAL_ALIGNMENT_BOTTOM;
+                advancedTexture.addControl(selectBox); 
+
+/*                 var transformGroup = new BABYLON.GUI.CheckboxGroup("Transformation");
+                transformGroup.addCheckbox("Small", toSize);
+                transformGroup.addCheckbox("High", toPlace); */
+/* 
+                var colorGroup = new BABYLON.GUI.RadioGroup("Color");
+                colorGroup.addRadio("Blue", setColor, true);
+                colorGroup.addRadio("Red", setColor);
+
+                (method) BABYLON.GUI.SliderGroup.addSlider(label: string, func?: (v: number) => void,
+                 unit?: string, min?: number, max?: number, value?: number, onValueChange?: (v: number) => number): void
+                    Adds a slider to the SelectorGroup
+
+                    @param - label is the label for the SliderBar
+                    @param - func is the function called when the Slider moves
+                    @param - unit is a string describing the units used, eg degrees or metres
+                    @param - min is the minimum value for the Slider
+                    @param - max is the maximum value for the Slider
+                    @param - value is the start value for the Slider between min and max
+                    @param - onValueChange is the function used to format the value displayed, eg radians to degrees
+ */
+                var rotateGroup = new BABYLON.GUI.SliderGroup("Settings", "S");
+               // rotateGroup.addSlider("Force", orientateY, "impulse", 0, 0.1 * Math.PI, 7, displayValue) // "degs"
+               // works great   rotateGroup.addSlider("Force",setImpulse," ", 1, 10, 1, displayValue)
+                rotateGroup.addSlider("Force",setImpulse," ", 1, 10, 1, displayValue)
+
+               // console.log("@@@@@@@@@@@ value @@@@@@@@@@@@ " + value);
+               // impulseMagnitude = impulseMagnitudeSliderValue;
+             //   selectBox.addGroup(transformGroup);
+             //   selectBox.addGroup(colorGroup);
+                selectBox.addGroup(rotateGroup);
+
+            }
+
+
+
 
 
              let load3Dgui = function() {
              // Create the 3D UI manager
              var gui3Dmanager = new BABYLON.GUI.GUI3DManager(scene);
+             
         
         // Create a horizontal stack panel
         var gui3Dpanel = new BABYLON.GUI.StackPanel3D();
-        gui3Dpanel.margin = 0.09; // 0.02;
+        gui3Dpanel.margin = 1.09; // 0.02;
       
         gui3Dmanager.addControl(gui3Dpanel);
         gui3Dpanel.position.x = 0.0;
@@ -850,9 +986,9 @@
 
             if (!gui3Dpanel.isVertical) {
             //var text1 = new BABYLON.GUI.TextBlock();
-            text1.text = "new orientation";
-            text1.color = "white";
-            text1.fontSize = 24;
+            //text1.text = "new orientation";
+            //text1.color = "white";
+            //text1.fontSize = 24;
             }
 
             // button3D.content = text1;           
@@ -869,17 +1005,18 @@
             createDefaultPipeline();
             createMeshLoop();
             setActionManagers();
-      //      setShadow();
+         //   setShadow();
             setPhysics();
             createGround();
-            createFacePoints(); // part of roll over vertices.
+         //   createFacePoints(); // part of roll over vertices.
             setGroundImposter();
             setImposter();
             createCatchMesh();
-          //  loadGUI();
-            load3Dgui();
+     //     loadGUI();
+        //    load3Dgui();
+        loadSelectionPanel();
 
-// scene.debugLayer.show();
+    //     scene.debugLayer.show();
 
             canvas.addEventListener("pointermove", onPointerMove, false);
             return scene;
