@@ -238,6 +238,19 @@
                 advancedTexture.rootContainer.scaleX = window.devicePixelRatio;
                 advancedTexture.rootContainer.scaleY = window.devicePixelRatio;
 
+                // number of blocks
+                var totalValue = new BABYLON.GUI.SliderGroup("Height", "S");
+                totalValue.zIndex = 3;
+                totalValue.horizontalAlignment = BABYLON.GUI.Control.HORIZONTAL_ALIGNMENT_CENTER;
+                totalValue.verticalAlignment = BABYLON.GUI.Control.VERTICAL_ALIGNMENT_CENTER;
+                totalValue.addSlider("Total Blocks", setTotalBlocks, " ", 6, 84, 30, displayValueTotal)
+                //  totalValue.top = -35; // ID 4
+                totalValue.width = '90%';
+                let junk = scene.getElementById = 6;
+                junk.verticalAlignment = BABYLON.GUI.Control.VERTICAL_ALIGNMENT_CENTER;
+                //totalValue.paddingBottom = 50;
+              //totalValue.height = 30;
+
                 /*              TextBlock       Property	    Type	`Comments
                                 lineSpacing(0px)	valueAndUnit	        Can be set to configure vertical spacing between text lines
                                 text(null)	    string	    Text to display
@@ -268,7 +281,7 @@
  */
 
 
-                // commonStyle
+/*                 // commonStyle
                 var regularStyle = advancedTexture.createStyle();
                 regularStyle.fontSize = 18;
                 regularStyle.fontStyle = "regular";
@@ -281,7 +294,7 @@
                 regularStyle.fontSize = 18;
                 regularStyle.outlineWidth = 3;
                 regularStyle.outlineColor = "black";
-
+ */
 
 
                 // resizing text Reference : https://www.babylonjs-playground.com/#XCPP9Y#726
@@ -328,8 +341,8 @@
 
                 var panel = new BABYLON.GUI.SelectionPanel("panel");
                 panel.fontSize = 20;
-                panel.width = 0.26;
-                panel.height = 0.65;//0.60;
+                panel.width = 0.25;
+                panel.height = 0.22;//0.60;
                 panel.horizontalAlignment = BABYLON.GUI.Control.HORIZONTAL_ALIGNMENT_CENTER;
                 panel.verticalAlignment = BABYLON.GUI.Control.VERTICAL_ALIGNMENT_CENTER;
                 panel.zIndex = 1;
@@ -357,7 +370,9 @@
 
 
 
-                // ------             var transformGroup = new BABYLON.GUI.CheckboxGroup("Transformation");
+                            var spacerGroup1 = new BABYLON.GUI.CheckboxGroup("");
+                            spacerGroup1.height = '200px';
+                //            var spacerGroup2 = new BABYLON.GUI.CheckboxGroup("");
                 // ------              transformGroup.addCheckbox("Small", );
                 // ------              transformGroup.addCheckbox("High", ); 
 
@@ -370,9 +385,10 @@
                                 @param - func is the function called when the Selector is checked
                                 @param - checked is true when Selector is checked */
 
-                // ------           var colorGroup = new BABYLON.GUI.RadioGroup("");
-                //  ------           colorGroup.addRadio("Play",setData);
-                // colorGroup.addRadio("Red", );
+                var colorGroup = new BABYLON.GUI.RadioGroup("");
+                //colorGroup.addRadio("Play",setData);
+                //colorGroup.addRadio("Red", );
+                //colorGroup.addRadio("", );
 
 
                 /*                 var createLabel = function (mesh) { // follows mesh
@@ -408,8 +424,8 @@
                  @param - value is the start value for the Slider between min and max
                  @param - onValueChange is the function used to format the value displayed, eg radians to degrees
                  */
-                var totalValue = new BABYLON.GUI.SliderGroup("Height", "S");
-                totalValue.addSlider("Total Blocks", setTotalBlocks, " ", 6, 84, 30, displayValueTotal)
+         //       var totalValue = new BABYLON.GUI.SliderGroup("Height", "S");
+         //       totalValue.addSlider("Total Blocks", setTotalBlocks, " ", 6, 84, 30, displayValueTotal)
 
 
                 /*                 button = BABYLON.GUI.Button.CreateSimpleButton('btn', 'Button');
@@ -424,14 +440,14 @@
                 // advancedTexture.rootContainer.scaleX = window.devicePixelRatio;
                 // advancedTexture.rootContainer.scaleY = window.devicePixelRatio;
 
-                var button1 = BABYLON.GUI.Button.CreateSimpleButton("but1", 'Hi there and greetings!');
+/*                 var button1 = BABYLON.GUI.Button.CreateSimpleButton("but1", 'Hi there and greetings!');
                 button1.width = '250px';
                 button1.height = '30px';
                 button1.color = "black";
                 button1.fontSize = 20;
                 button1.thickness = 0;
                 button1.background = "white";
-                // advancedTexture.addControl(button1);
+                // advancedTexture.addControl(button1); */
 
 
                 /* 
@@ -455,13 +471,17 @@
                 
                  */
                 //advancedTexture.addControl(button);
-                let loadTitle = function () { }
+
+// TITLE ////////////////////////////////////////////////
+
+                let loadTitle = function () {
                 var titleRectangle = new BABYLON.GUI.Rectangle('');
                 titleRectangle.width = .25;
                 titleRectangle.height = .1;
                 titleRectangle.top = -210;
                 titleRectangle.thickness = 4;
                 titleRectangle.color = "orange";
+                titleRectangle.background = "#336699";
                 advancedTexture.addControl(titleRectangle);
 
                 var title = new BABYLON.GUI.TextBlock();
@@ -488,13 +508,16 @@
                         title.fontSize = parseFloat(title.fontSizeInPixels) * ratioWidths + "px";
                     }
                 });
+            }
 
-                let loadDirections = function () { }
+// DIRECTIONS ////////////////////////////////////////////////
+
+                let loadDirections = function () { 
                 var directionsRectangle = new BABYLON.GUI.Rectangle('');
                 directionsRectangle.width = .25;
-                directionsRectangle.height = .12;
+                directionsRectangle.height = .10;
                 directionsRectangle.top = -130;
-                //directionsRectangle.thickness = 4;
+                directionsRectangle.thickness = 4;
                 directionsRectangle.color = "orange";
                 advancedTexture.addControl(directionsRectangle);
 
@@ -522,6 +545,55 @@
                         directions.fontSize = parseFloat(directions.fontSizeInPixels) * ratioWidths + "px";
                     }
                 });
+            }
+
+// SPACER ////////////////////////////////////////////////
+                
+/*                 var textGroup = new BABYLON.GUI.CheckboxGroup("spacer");
+                //  textGroup.TextBlock.color = "white";
+                 var textGroup = new BABYLON.GUI.TextBlock();
+                     textGroup.height = 0.70;
+                   //  textGroup.thickness = 0.7;
+                    var text1 = new BABYLON.GUI.TextBlock();
+                    text1.horizontalTextAlignment = BABYLON.GUI.Control.HORIZONTAL_ALIGNMENT_CENTER;
+                    text1.text = "Hello world";
+                //     textGroup.color = "#0394fc";
+                //    text1.fontSize = 14;
+                text1.zIndex = 2;
+                 advancedTexture.addControl(text1); 
+ */
+
+ 
+              //  var totalValueHolder = new BABYLON.GUI.TextBlock();
+              //  totalValueHolder.color = "white";
+              //  totalValueHolder.outlineWidth = 5.6;
+/*                directions.outlineColor = "black";
+                directions.lineSpacing = 1;
+                directions.textWrapping = true;
+                directions.textHorizontalAlignment = 2;// 1 = right, 2 = center, 3 = left
+                directions.textVerticalAlignment = 2;// 1 = bottom, 2 = center, 3 = ?
+                directions.fontStyle = "italic";
+                directions.fontFamily = "Verdana";
+                directions.fontSize = 20;
+                // directions.fontSize = "100%";
+                directions.text = "Adjust Tower building settings";
+                */
+               // loadTotalRectangle.zIndex = 2;
+
+             //   loadTotalRectangle.addControl(totalValue);
+                /*
+                directions.onLinesReadyObservable.add(() => {
+                    var textHeight = (directions.fontOffset.height) * directions.lines.length;
+                    var ratioHeights = directions.parent.heightInPixels / textHeight;
+                    var textWidth = directions.lines[0].width;
+                    var ratioWidths = directions.parent.widthInPixels / textWidth;
+                    if (ratioWidths < 1) {
+                        directions.fontSize = parseFloat(directions.fontSizeInPixels) * ratioWidths + "px";
+
+
+                    }
+                }); 
+                */
 
 
 
@@ -530,14 +602,22 @@
                 // impulseMagnitude = impulseMagnitudeSliderValue;
                 //     advancedTexture.addControl(title); // title
                 // panel.addControl(title);
-                loadTitle();
+   loadTitle();
+ loadDirections();
 
+               
+
+                
 
 
                 //     advancedTexture.addControl(direction1); ;// directions
-                //              panel.addGroup(totalValue); // total block count >> 
-                //              panel.addGroup(transformGroup);
-                //              panel.addGroup(colorGroup);
+                 
+             //   panel.addGroup(spacerGroup1);
+              //  panel.addGroup(spacerGroup2);
+             // fails - advancedTexture.addControl(totalValue);
+                panel.addGroup(totalValue); // total block count >> move by changing panel height
+
+                
                 //    advancedTexture.addControl(button);
                 //    advancedTexture.addControl(button1);
                 //   panel.addGroup(button); // shows if just above line, but not current.
@@ -575,7 +655,7 @@
                 //location.href = "2b-local-storage.html";
             }
 
-            // --------- scene.debugLayer.show();
+// ------           scene.debugLayer.show();
             loadSelectionPanel();
             //   saveData("Paul", "password");
 
