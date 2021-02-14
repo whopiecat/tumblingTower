@@ -1,19 +1,18 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
+
+<head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0" />
+    <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0" />
     <meta name="theme-color" content="#000000" />
-    <meta
-      name="description"
-      content="Interactive physics game"
-    />
+    <meta name="description" content="Interactive physics game" />
     <meta property="og:locale" content="en_US" />
     <meta property="og:type" content="article" />
     <meta property="og:title" content="Tumbling Tower" />
 
     <link rel="shortcut icon" href="favicon.ico" />
-    
+
     <!--
       manifest.json provides metadata used when your web app is installed on a
       user's mobile device or desktop. See https://developers.google.com/web/fundamentals/web-app-manifest/
@@ -29,8 +28,9 @@
       Learn how to configure a non-root public URL by running `npm run build`.
     -->
     <title>Tumbling Tower</title>
-  </head>
-  <body>
+</head>
+
+<body>
     <noscript>You need to enable JavaScript to run this app.</noscript>
     <div id="loadingScreen"></div>
     <div id="root"></div>
@@ -44,62 +44,76 @@
       To begin the development, run `npm start` or `yarn start`.
       To create a production bundle, use `npm run build` or `yarn build`.
     -->
-  </body>
+</body>
+
 </html>
-    <!-- Babylon.js -->
-    <script src="https://code.jquery.com/pep/0.4.2/pep.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/dat-gui/0.6.2/dat.gui.min.js"></script>
-    <script src="https://preview.babylonjs.com/ammo.js"></script>
-    <script src="https://preview.babylonjs.com/cannon.js"></script>
-    <script src="https://preview.babylonjs.com/Oimo.js"></script>
-    <script src="https://preview.babylonjs.com/earcut.min.js"></script>
-    <script src="https://preview.babylonjs.com/babylon.js"></script>
-    <script src="https://preview.babylonjs.com/materialsLibrary/babylonjs.materials.min.js"></script>
-    <script src="https://preview.babylonjs.com/proceduralTexturesLibrary/babylonjs.proceduralTextures.min.js"></script>
-    <script src="https://preview.babylonjs.com/postProcessesLibrary/babylonjs.postProcess.min.js"></script>
-    <script src="https://preview.babylonjs.com/loaders/babylonjs.loaders.js"></script>
-    <script src="https://preview.babylonjs.com/serializers/babylonjs.serializers.min.js"></script>
-    <script src="https://preview.babylonjs.com/gui/babylon.gui.min.js"></script>
-    <script src="https://preview.babylonjs.com/inspector/babylon.inspector.bundle.js"></script>
-    <!--script>src = "https://cdn.babylonjs.com/ammo.js"</script-->
-    <!--script src="https://preview.babylonjs.com/ammo.js"></script-->
-    <!--script src="https://preview.babylonjs.com/Oimo.js"></script-->
+<!-- Babylon.js -->
+<script src="https://code.jquery.com/pep/0.4.2/pep.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/dat-gui/0.6.2/dat.gui.min.js"></script>
+<script src="https://preview.babylonjs.com/ammo.js"></script>
+<script src="https://preview.babylonjs.com/cannon.js"></script>
+<script src="https://preview.babylonjs.com/Oimo.js"></script>
+<script src="https://preview.babylonjs.com/earcut.min.js"></script>
+<script src="https://preview.babylonjs.com/babylon.js"></script>
+<script src="https://preview.babylonjs.com/materialsLibrary/babylonjs.materials.min.js"></script>
+<script src="https://preview.babylonjs.com/proceduralTexturesLibrary/babylonjs.proceduralTextures.min.js"></script>
+<script src="https://preview.babylonjs.com/postProcessesLibrary/babylonjs.postProcess.min.js"></script>
+<script src="https://preview.babylonjs.com/loaders/babylonjs.loaders.js"></script>
+<script src="https://preview.babylonjs.com/serializers/babylonjs.serializers.min.js"></script>
+<script src="https://preview.babylonjs.com/gui/babylon.gui.min.js"></script>
+<script src="https://preview.babylonjs.com/inspector/babylon.inspector.bundle.js"></script>
+<!--script>src = "https://cdn.babylonjs.com/ammo.js"</script-->
+<!--script src="https://preview.babylonjs.com/ammo.js"></script-->
+<!--script src="https://preview.babylonjs.com/Oimo.js"></script-->
 
-    <style>
-        html,
-        body {
-            overflow: hidden;
-            width: 100%;
-            height: 100%;
-            margin: 0;
-            padding: 0;
-        }
+<style>
+    html,
+    body {
+        overflow: hidden;
+        width: 100%;
+        height: 100%;
+        margin: 0;
+        padding: 0;
+    }
 
-        #renderCanvas {
-            width: 100%;
-            height: 100%;
-            touch-action: none;
-        }
+    #renderCanvas {
+        width: 100%;
+        height: 100%;
+        touch-action: none;
+    }
 
-        #viewerProgress {
-              width: 100%;
-              background-color: #ddd;
-            }
-            #viewerProgressBar {
-              width: 1%;
-              height: 30px;
-              color: #FFF;
-              background-color: mediumblue;
-              text-align: left;
-              padding-top: 5px;
-              overflow: hidden;
-              font-size: 100%;
-            }
-            .viewer-wrap {width:50%;height: 50vh;}
-            #viewer-overlay-image { z-index: 900; width: 100%;height: 100%;position: relative;top:0px;background-position: center;background-repeat: no-repeat;background-size: cover;}
+    #viewerProgress {
+        width: 100%;
+        background-color: #ddd;
+    }
 
+    #viewerProgressBar {
+        width: 1%;
+        height: 30px;
+        color: #FFF;
+        background-color: mediumblue;
+        text-align: left;
+        padding-top: 5px;
+        overflow: hidden;
+        font-size: 100%;
+    }
 
-    </style>
+    .viewer-wrap {
+        width: 50%;
+        height: 50vh;
+    }
+
+    #viewer-overlay-image {
+        z-index: 900;
+        width: 100%;
+        height: 100%;
+        position: relative;
+        top: 0px;
+        background-position: center;
+        background-repeat: no-repeat;
+        background-size: cover;
+    }
+</style>
 </head>
 
 <body>
@@ -107,38 +121,59 @@
     <script>
         var canvas = document.getElementById("renderCanvas");
         var sceneToRender = null;
-        
+        var button;
+        value = 0;
         // data /////////////////////////////////////////
 
-/*     function saveData(user, pass) {
-        var account = {
-            User: user,
-            Pass: pass
-        };
-        //converts to JSON string the Object
-        account = JSON.stringify(account);
-        //creates a base-64 encoded ASCII string
-        account = btoa(account);
-        //save the encoded accout to web storage
-        localStorage.setItem('_account', account);
-    } */
+        /*     function saveData(user, pass) {
+                var account = {
+                    User: user,
+                    Pass: pass
+                };
+                //converts to JSON string the Object
+                account = JSON.stringify(account);
+                //creates a base-64 encoded ASCII string
+                account = btoa(account);
+                //save the encoded accout to web storage
+                localStorage.setItem('_account', account);
+            } */
 
-    function saveData(user, pass) {
-            var account = {
-                User: user,
-                Pass: pass
-            };
-            //converts to JSON string the Object
-            account = JSON.stringify(account);
-            //creates a base-64 encoded ASCII string
-            account = btoa(account);
-            //save the encoded accout to web storage
-            localStorage.setItem('_account', account);
+        /*     function saveData(user, pass) {
+                console.log("saveData called");
+                    var account = {
+                        User: user,
+                        Pass: pass
+                        
+                    };
+                    //converts to JSON string the Object
+                    account = JSON.stringify(account);
+                    //creates a base-64 encoded ASCII string
+                    account = btoa(account);
+                    //save the encoded accout to web storage
+                    localStorage.setItem('_account', account);
+                   // window.location.replace("http://doc.babylonjs.com/"); 
+                   window.location.replace("/test/tower2/index.html"); 
+                    // window.open("http://doc.babylonjs.com/","_self");
+                    // window.location.replace("http://www.w3schools.com");
+                    // window.location.href = "http://example.com";
+                } */
+
+
+
+
+
+
+        // data /////////////////////////////////////////
+
+        var displayValueTotal = function (value) {
+            // return BABYLON.Tools.ToDegrees(value) | 0;
+            //return (value | 10);
+            // value = (Math.round(value * 10) / 10); // (Math.round(value * 10) / 10);
+            value = (Math.floor(value));
+            three = value;
+            console.log("three set to " + value + " in displayValueTotal");
+            return value;
         }
-
-        // data /////////////////////////////////////////
-
-
 
 
         //var createDefaultEngine = function () { return new BABYLON.Engine(canvas, true, { preserveDrawingBuffer: true, stencil: true,  disableWebGL2Support: false }); };
@@ -147,12 +182,13 @@
 
         var createScene = async function () {
             var scene = new BABYLON.Scene(engine);
-            scene.clearColor = new BABYLON.Color3( .5, .5, .5);
+            scene.clearColor = new BABYLON.Color3(.5, .5, .5);
             var camera = new BABYLON.ArcRotateCamera("camera", 1 * Math.PI / 3, Math.PI / 2.5, 100, BABYLON.Vector3.Zero(), scene);
-             camera.setTarget(BABYLON.Vector3.Zero());
+            camera.setTarget(BABYLON.Vector3.Zero());
 
 
-             // GUI - //
+
+            // GUI - //
             var loadSelectionPanel = function () {
 
                 /*                 var toSize = function (isChecked) {
@@ -189,80 +225,175 @@
                 boxSlider.position.y = 1.0;
                 boxSlider.position.z = 2.5; */
 
-/*                 var orientateY = function (angle) {
-                    boxSlider.rotation.y = angle;
-                    boxSlider.rotation.x = angle;
-                } */
+                /*                 var orientateY = function (angle) {
+                                    boxSlider.rotation.y = angle;
+                                    boxSlider.rotation.x = angle;
+                                } */
 
-                var setImpulse = function (value) {
-                    impulseMagnitude = value;
-                    //console.log("setImpulse value " + value );
-                }
 
-                var displayValue = function (value) {
-                    // return BABYLON.Tools.ToDegrees(value) | 0;
-                    //return (value | 10);
-                    // value = (Math.round(value * 10) / 10); // (Math.round(value * 10) / 10);
-                    value = (Math.floor(value));
-                    return value;
-                }
+
+
 
                 var advancedTexture = BABYLON.GUI.AdvancedDynamicTexture.CreateFullscreenUI("UImenu");
-                
-            var textGroup = new BABYLON.GUI.CheckboxGroup("Tumbling Tower");
-           // textGroup.get
-          //  textGroup.TextBlock.color = "white";
-        // var textGroup = new BABYLON.GUI.TextBlock();
-           // textGroup.height = 0.30;
-            //    var text1 = new BABYLON.GUI.TextBlock();
-            //    text1.horizontalTextAlignment = BABYLON.GUI.Control.HORIZONTAL_ALIGNMENT_CENTER;
-            //    text1.text = "Hello world";
-                textGroup.color = "#0394fc";
-            //    text1.fontSize = 14;
-               // advancedTexture.addControl(text1); 
+                advancedTexture.rootContainer.scaleX = window.devicePixelRatio;
+                advancedTexture.rootContainer.scaleY = window.devicePixelRatio;
+
+                /*              TextBlock       Property	    Type	`Comments
+                                lineSpacing(0px)	valueAndUnit	        Can be set to configure vertical spacing between text lines
+                                text(null)	    string	    Text to display
+                                textWrapping(false)	boolean             	Can be set to true to enable text wrapping.
+                                resizeToFit(false)	boolean	                Can be set to true to enable resize to fit.
+                                textHorizontalAlignment(2)	number	        Can be set to left, right or center
+                                textVerticalAlignment(2)	number	        Can be set to top, bottom or center
+                                outlineWidth(0)	number	                    Text outline size, in pixels.
+                                outlineColor("white")	string	            Text outline color.
+                                wordSplittingFunction	string	            Function to use to split the text into words
+                               
+                                The control currently provides 1 observable:
+                                Observables	Comments
+                                onTextChangedObservable	Raised when the text has changed */
+
+/*                 // titleStyle
+                var titleStyle = advancedTexture.createStyle();
+                titleStyle.fontSize = 26;
+                //     titleStyle.fontStyle = "bold";
+                titleStyle.color = "white";
+                titleStyle.lineSpacing = 0;
+                titleStyle.textWrapping = true;
+                titleStyle.resizeToFit = true;
+                titleStyle.textHorizontalAlignment = 2;// 1 = right, 2 = center, 3 = left
+                titleStyle.textVerticalAlignment = 3;// 1 = bottom, 2 = center, 3 = ?
+                titleStyle.fontStyle = "italic";
+                titleStyle.fontFamily = "Verdana";
+ */
+
+
+                // commonStyle
+                var regularStyle = advancedTexture.createStyle();
+                regularStyle.fontSize = 18;
+                regularStyle.fontStyle = "regular";
+                regularStyle.lineSpacing = 0;
+                regularStyle.textWrapping = true;
+                regularStyle.resizeToFit = true;
+                regularStyle.textHorizontalAlignment = 2;// 1 = right, 2 = center, 3 = left
+                regularStyle.textVerticalAlignment = 2;// 1 = bottom, 2 = center, 3 = ?
+                regularStyle.color = "white";
+                regularStyle.fontSize = 18;
+                regularStyle.outlineWidth = 3;
+                regularStyle.outlineColor = "black";
+
+
+
+                // resizing text Reference : https://www.babylonjs-playground.com/#XCPP9Y#726
+
+/*                 var title = new BABYLON.GUI.TextBlock();
+                title.color = "white"
+                title.outlineWidth = 5.5;
+                title.outlineColor = "black";
+                title.paddingBottom = 600;
+                title.text = "Tumbling Tower";
+                //title.left = -200;
+                //  title.top = -50;
+                //    title.width = '420px';
+                //    title.height = '600px';
+                //   title.style = titleStyle;
+                title.zIndex = 2;
+                //advancedTexture.addControl(title);
+ */
+/*                 var direction1 = new BABYLON.GUI.TextBlock();
+                direction1.color = "white";
+                direction1.outlineWidth = 4.0;
+                direction1.outlineColor = "black";
+                direction1.paddingBottom = 540;
+                direction1.text = "Adjust Tower building settings";
+                //direction1.left = -200;
+                //  direction1.top = -50;
+                direction1.width = '420px';
+                direction1.height = '180px';
+                direction1.style = regularStyle;
+                direction1.zIndex = 2;
+                advancedTexture.addControl(direction1); */
+
+                //    var textGroup = new BABYLON.GUI.CheckboxGroup("Tumbling Tower");
+                // textGroup.get
+                //  textGroup.TextBlock.color = "white";
+                // var textGroup = new BABYLON.GUI.TextBlock();
+                //     textGroup.height = 0.30;
+                //    var text1 = new BABYLON.GUI.TextBlock();
+                //    text1.horizontalTextAlignment = BABYLON.GUI.Control.HORIZONTAL_ALIGNMENT_CENTER;
+                //    text1.text = "Hello world";
+                //     textGroup.color = "#0394fc";
+                //    text1.fontSize = 14;
+                // advancedTexture.addControl(text1); 
 
                 var panel = new BABYLON.GUI.SelectionPanel("panel");
                 panel.fontSize = 20;
-                panel.width = 0.22;
-                panel.height = 0.60;//0.18;
+                panel.width = 0.26;
+                panel.height = 0.65;//0.60;
                 panel.horizontalAlignment = BABYLON.GUI.Control.HORIZONTAL_ALIGNMENT_CENTER;
                 panel.verticalAlignment = BABYLON.GUI.Control.VERTICAL_ALIGNMENT_CENTER;
+                panel.zIndex = 1;
+                /* Change Color Scheme  */
+                panel.color = "orange";// blue
+                panel.background = "#336699"; // "#0394fc"
+                panel.barColor = "orange"; // "#4F7DF2"
+                panel.headerColor = "white";
+                panel.buttonColor = "orange";
+                panel.buttonBackground = "#684502"
+                panel.isVertical = true;
 
-                    /* Change Color Scheme  */
-                    panel.color = "orange";// blue
-                    panel.background = "#336699"; // "#0394fc"
-                    panel.barColor = "orange"; // "#4F7DF2"
-                    panel.headerColor = "white";
-                    panel.buttonColor = "orange";
-                    panel.buttonBackground = "#684502"
 
-                    // Babylon.js playground reference  https://playground.babylonjs.com/#BXMTCD#2
+                // Babylon.js playground reference  https://playground.babylonjs.com/#BXMTCD#2
+
 
                 advancedTexture.addControl(panel);
 
-
-
-
-
-
-                var transformGroup = new BABYLON.GUI.CheckboxGroup("Transformation");
-                transformGroup.addCheckbox("Small", );
-                transformGroup.addCheckbox("High", ); 
-
-
-/* 
-                (method) BABYLON.GUI.RadioGroup.addRadio(label: string, func?: (n: number) => void, checked?: boolean): void
-                Adds a radio button as a control
-
-                @param - label is the label for the selector
+                /*(method) BABYLON.GUI.CheckboxGroup.addCheckbox(text: string, func?: (s: boolean) => void, checked?: boolean): void
+                Adds a checkbox as a control
+                @param - text is the label for the selector
                 @param - func is the function called when the Selector is checked
                 @param - checked is true when Selector is checked */
 
-                var colorGroup = new BABYLON.GUI.RadioGroup("Color");
-                colorGroup.addRadio("Blue",  true);
-                colorGroup.addRadio("Red", );
 
 
+
+                // ------             var transformGroup = new BABYLON.GUI.CheckboxGroup("Transformation");
+                // ------              transformGroup.addCheckbox("Small", );
+                // ------              transformGroup.addCheckbox("High", ); 
+
+
+                /* 
+                                (method) BABYLON.GUI.RadioGroup.addRadio(label: string, func?: (n: number) => void, checked?: boolean): void
+                                Adds a radio button as a control
+                
+                                @param - label is the label for the selector
+                                @param - func is the function called when the Selector is checked
+                                @param - checked is true when Selector is checked */
+
+                // ------           var colorGroup = new BABYLON.GUI.RadioGroup("");
+                //  ------           colorGroup.addRadio("Play",setData);
+                // colorGroup.addRadio("Red", );
+
+
+                /*                 var createLabel = function (mesh) { // follows mesh
+                                    var label = new BABYLON.GUI.Rectangle("label for " + mesh.name);
+                                    label.background = "black"
+                                    label.height = "30px";
+                                    //label.alpha = 0.5;
+                                    label.width = "100px";
+                                    label.cornerRadius = 20;
+                                    label.thickness = 1;
+                                    label.linkOffsetY = 30;
+                                    advancedTexture.addControl(label);
+                                    label.linkWithMesh(mesh);
+                
+                                    var text1 = new BABYLON.GUI.TextBlock();
+                                    text1.text = mesh.name;
+                                    text1.color = "white";
+                                    label.addControl(text1);
+                
+                                    return label;
+                                } */
 
                 /*
                 (method) BABYLON.GUI.SliderGroup.addSlider(label: string, func?: (v: number) => void,
@@ -277,20 +408,190 @@
                  @param - value is the start value for the Slider between min and max
                  @param - onValueChange is the function used to format the value displayed, eg radians to degrees
                  */
-                var howTall = new BABYLON.GUI.SliderGroup("How Tall", "S");
-                howTall.addSlider("Number of Blocks total", setImpulse, " ", 6, 84, 30, displayValue)
+                var totalValue = new BABYLON.GUI.SliderGroup("Height", "S");
+                totalValue.addSlider("Total Blocks", setTotalBlocks, " ", 6, 84, 30, displayValueTotal)
+
+
+                /*                 button = BABYLON.GUI.Button.CreateSimpleButton('btn', 'Button');
+                                button.horizontalAlignment = BABYLON.GUI.Control.HORIZONTAL_ALIGNMENT_LEFT;
+                                button.verticalAlignment = BABYLON.GUI.Control.VERTICAL_ALIGNMENT_TOP;
+                                button.width = '100px';
+                                button.height = '50px';
+                                button.left = '30%';
+                                button.top = '30px'; */
+
+
+                // advancedTexture.rootContainer.scaleX = window.devicePixelRatio;
+                // advancedTexture.rootContainer.scaleY = window.devicePixelRatio;
+
+                var button1 = BABYLON.GUI.Button.CreateSimpleButton("but1", 'Hi there and greetings!');
+                button1.width = '250px';
+                button1.height = '30px';
+                button1.color = "black";
+                button1.fontSize = 20;
+                button1.thickness = 0;
+                button1.background = "white";
+                // advancedTexture.addControl(button1);
+
+
+                /* 
+                // reference https://www.babylonjs-playground.com/#3VMTI9#4
+                                var slider = new BABYLON.GUI.Slider();
+                                // slider.verticalAlignment = BABYLON.GUI.Control.VERTICAL_ALIGNMENT_TOP;
+                                slider.minimum = 0;
+                                slider.maximum = 400;
+                                slider.color = "#faba3d";
+                                slider.background = "#e2e2e2";
+                                slider.value = 200;
+                                slider.height = "220px";
+                                slider.width = "300px";
+                                // slider.isVertical = true;
+                                // slider.onValueChangedObservable.add(function(value) {
+                                //     var zoomValue = 400-value;
+                                // });
+                                sliderPanel.addControl(slider);
+                                slider.rotation = -Math.PI / 2;
+                
+                
+                 */
+                //advancedTexture.addControl(button);
+                let loadTitle = function () { }
+                var titleRectangle = new BABYLON.GUI.Rectangle('');
+                titleRectangle.width = .25;
+                titleRectangle.height = .1;
+                titleRectangle.top = -210;
+                titleRectangle.thickness = 4;
+                titleRectangle.color = "orange";
+                advancedTexture.addControl(titleRectangle);
+
+                var title = new BABYLON.GUI.TextBlock();
+                title.color = "white";
+                title.outlineWidth = 5.6;
+                title.outlineColor = "black";
+                title.lineSpacing = 1;
+                title.textWrapping = true;
+                title.textHorizontalAlignment = 2;// 1 = right, 2 = center, 3 = left
+                title.textVerticalAlignment = 2;// 1 = bottom, 2 = center, 3 = ?
+                title.fontStyle = "italic";
+                title.fontFamily = "Verdana";
+                title.fontSize = 26;
+                // title.fontSize = "100%";
+                title.text = "Tumbling Tower";
+                titleRectangle.zIndex = 2;
+                titleRectangle.addControl(title);
+                title.onLinesReadyObservable.add(() => {
+                    var textHeight = (title.fontOffset.height) * title.lines.length;
+                    var ratioHeights = title.parent.heightInPixels / textHeight;
+                    var textWidth = title.lines[0].width;
+                    var ratioWidths = title.parent.widthInPixels / textWidth;
+                    if (ratioWidths < 1) {
+                        title.fontSize = parseFloat(title.fontSizeInPixels) * ratioWidths + "px";
+                    }
+                });
+
+                let loadDirections = function () { }
+                var directionsRectangle = new BABYLON.GUI.Rectangle('');
+                directionsRectangle.width = .25;
+                directionsRectangle.height = .12;
+                directionsRectangle.top = -130;
+                //directionsRectangle.thickness = 4;
+                directionsRectangle.color = "orange";
+                advancedTexture.addControl(directionsRectangle);
+
+                var directions = new BABYLON.GUI.TextBlock();
+                directions.color = "white";
+                directions.outlineWidth = 5.6;
+                directions.outlineColor = "black";
+                directions.lineSpacing = 1;
+                directions.textWrapping = true;
+                directions.textHorizontalAlignment = 2;// 1 = right, 2 = center, 3 = left
+                directions.textVerticalAlignment = 2;// 1 = bottom, 2 = center, 3 = ?
+                directions.fontStyle = "italic";
+                directions.fontFamily = "Verdana";
+                directions.fontSize = 20;
+                // directions.fontSize = "100%";
+                directions.text = "Adjust Tower building settings";
+                directionsRectangle.zIndex = 2;
+                directionsRectangle.addControl(directions);
+                directions.onLinesReadyObservable.add(() => {
+                    var textHeight = (directions.fontOffset.height) * directions.lines.length;
+                    var ratioHeights = directions.parent.heightInPixels / textHeight;
+                    var textWidth = directions.lines[0].width;
+                    var ratioWidths = directions.parent.widthInPixels / textWidth;
+                    if (ratioWidths < 1) {
+                        directions.fontSize = parseFloat(directions.fontSizeInPixels) * ratioWidths + "px";
+                    }
+                });
+
+
+
 
                 // console.log("@@@@@@@@@@@ value @@@@@@@@@@@@ " + value);
                 // impulseMagnitude = impulseMagnitudeSliderValue;
-                panel.addGroup(textGroup);// title
-                panel.addGroup(transformGroup);
-                panel.addGroup(colorGroup);
-                panel.addGroup(howTall);
-                
+                //     advancedTexture.addControl(title); // title
+                // panel.addControl(title);
+                loadTitle();
+
+
+
+                //     advancedTexture.addControl(direction1); ;// directions
+                //              panel.addGroup(totalValue); // total block count >> 
+                //              panel.addGroup(transformGroup);
+                //              panel.addGroup(colorGroup);
+                //    advancedTexture.addControl(button);
+                //    advancedTexture.addControl(button1);
+                //   panel.addGroup(button); // shows if just above line, but not current.
+
+
+                var setTotalBlocks = function (value) {
+                    crateCountTotalGoal = value;
+                    //console.log("setImpulse value " + value );
+                    return crateCountTotalGoal;
+                }
+
+
+
             }
 
-            scene.debugLayer.show();
+            function setData() {
+                // (A) VARIABLES TO PASS
+                console.log("////////// setData called //////////");
+
+
+                var first = "Foo Bar",
+                    second = ["Hello", "World"];
+
+
+                // (B) SAVE TO LOCAL STORAGE
+                // localStorage.setItem("KEY", "VALUE");
+                localStorage.setItem("first", first);
+                // local storage cannot store array and objects
+                // JSON encode before storing, convert to string
+                localStorage.setItem("second", JSON.stringify(second));
+                localStorage.setItem("three", three);
+                // (C) REDIRECT OR OPEN NEW WINDOW IF YOU WANT
+                // window.open("index.html _self");
+                window.open('index.html', '_self', false)
+                //location.href = "2b-local-storage.html";
+            }
+
+            // --------- scene.debugLayer.show();
             loadSelectionPanel();
+            //   saveData("Paul", "password");
+
+
+            /* button.actionManager = new BABYLON.ActionManager(scene);
+    
+    button.actionManager.registerAction(
+           new BABYLON.ExecuteCodeAction(BABYLON.ActionManager.OnPickTrigger,function(event){
+               var pickedMesh = event.meshUnderPointer; 
+   
+               window.open("http://doc.babylonjs.com/");
+           })
+       ); */
+
+
+
 
             return scene;
         };
@@ -319,6 +620,9 @@
             engine.resize();
         });
     </script>
+
+    <input type="button" value="Store To Local Storage" onclick="store()" />
+
 </body>
 
 </html> -->

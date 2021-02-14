@@ -128,7 +128,7 @@
         let distanceToMoveVertical = 0.0;
         let widerAmountX = 0.0;
         let widerAmountZ = 0.0;
-        let impulseMagnitude = 3.0;
+        let impulseMagnitude = 7.0;
         
         // data /////////////////////////////////////
 
@@ -146,7 +146,8 @@
     } */
 
     
-    function loadData() {
+/*     function loadData() {
+        console.log(" ........ loadData called ............... ");
         var account = localStorage.getItem('_account');
         if (!account) return false;
         localStorage.removeItem('_account');
@@ -155,9 +156,39 @@
         //parses to Object the JSON string
         account = JSON.parse(account);
         //do what you need with the Object
-        fillFields(account.User, account.Pass);
+        console.log(" //////////////// account //////////////////// " + account);
+        //fillFields(account.User, account.Pass);
         return true;
     }
+    loadData();
+
+     */
+
+     function getData () {
+  // (A) GET FROM SESSION
+  console.log("////////// getData called //////////")
+ //let crateCountTotalGoal = localStorage.getItem("crateCountTotalGoal"),
+  var first = localStorage.getItem("first"),
+      // JSON parse to turn stored sting back into array
+      second = JSON.parse(localStorage.getItem("second"));
+      var three = localStorage.getItem("three")
+
+  // (B) IT WORKS!
+  // NOTE: Local storage is persistent
+  // Will not be deleted unless user clears browser data or manually cleared
+  console.log("first" + first); // Foo Bar
+  console.log("second " + second); // ["Hello", "World"]
+  console.log("three" + three);
+  crateCountTotalGoal = three;
+  console.log("crateCountTotalGoal in getData is " + crateCountTotalGoal);
+  // (EXTRA) TO CLEAR
+  // localStorage.removeItem("KEY");
+  // localStorage.clear();
+}
+getData(crateCountTotalGoal);
+console.log("crateCountTotalGoal after getData is " + crateCountTotalGoal);
+
+
 
         // data /////////////////////////////////////////
 
@@ -231,7 +262,8 @@
             var light = new BABYLON.DirectionalLight("dir02", new BABYLON.Vector3(0.2, -1, 0), scene);
             light.position = new BABYLON.Vector3(-76.104, -12.032, -96.969);
             light.direction = new BABYLON.Vector3(0.191, -0.953, 0.233);
-            light.intensity = 0.2;// 0.6
+            //light.direction = new BABYLON.Vector3(0.0, 1.0, 0.0);
+            light.intensity = 0.6;// 0.6
 
 
             //    var light1 = new BABYLON.PointLight("omni1", new BABYLON.Vector3(0, 50, 0), scene);
@@ -603,7 +635,8 @@
             let createMeshLoop = function (meshSource) {
                 // ---------------- EXTERNAL -------------------------------- //                
                 // MESH GOAL //
-                crateCountTotalGoal = 84; //30 >> good start // 84
+               // crateCountTotalGoal = 30; //30 >> good start // 84
+              // crateCountTotalGoal = null;
 
                ++ crateCountTotalGoal;
                 // MESH GOAL //
@@ -684,7 +717,7 @@
                 ++crateCountCurrent;
                 ++crateCountTotal;
                 ++rotateAdjusted
-                console.log("crate count total " + crateCountTotal);
+  // ------------ console.log("crate count total " + crateCountTotal);
              //   console.log("crate count Current " + crateCountCurrent);
             //    console.log("The rotateAdjusted value is " + rotateAdjusted);
             //    console.log("The rotationBetaY value is " + rotationBetaY);
@@ -908,13 +941,16 @@
                 }
 
                 var advancedTexture = BABYLON.GUI.AdvancedDynamicTexture.CreateFullscreenUI("UI");
-                
+                var textGroup = new BABYLON.GUI.CheckboxGroup("Tumbling Tower");
 
                 var panel = new BABYLON.GUI.SelectionPanel("panel");
-                panel.width = 0.15;// .width = 0.20;
-                panel.height = 0.18;
-                panel.horizontalAlignment = BABYLON.GUI.Control.HORIZONTAL_ALIGNMENT_LEFT;
-                panel.verticalAlignment = BABYLON.GUI.Control.VERTICAL_ALIGNMENT_CENTER;
+                panel.width = 0.50;// .width = 0.20;
+                panel.height = 0.22;
+                panel.fontSize = 14;
+               // panel.width = 0.22;
+               // panel.height = 0.60;//0.18;
+                panel.horizontalAlignment = BABYLON.GUI.Control.HORIZONTAL_ALIGNMENT_CENTER;
+                panel.verticalAlignment = BABYLON.GUI.Control.VERTICAL_ALIGNMENT_TOP;
 
                 /* Change Color Scheme  */
                 panel.color = "orange";// blue
@@ -924,7 +960,8 @@
                 panel.buttonColor = "orange";
                 panel.buttonBackground = "#684502"
 
-                advancedTexture.addControl(panel); 
+                advancedTexture.addControl(panel);
+                
 
 /*                 var transformGroup = new BABYLON.GUI.CheckboxGroup("Transformation");
                 transformGroup.addCheckbox("Small", toSize);
@@ -949,12 +986,13 @@
                 var rotateGroup = new BABYLON.GUI.SliderGroup("Settings", "S");
                // rotateGroup.addSlider("Force", orientateY, "impulse", 0, 0.1 * Math.PI, 7, displayValue) // "degs"
                // works great   rotateGroup.addSlider("Force",setImpulse," ", 1, 10, 1, displayValue)
-                rotateGroup.addSlider("Force",setImpulse," ", 3, 10, 3, displayValue)
+                rotateGroup.addSlider("Force",setImpulse," ", 3, 15, 7, displayValue)
 
                // console.log("@@@@@@@@@@@ value @@@@@@@@@@@@ " + value);
                // impulseMagnitude = impulseMagnitudeSliderValue;
              //   panel.addGroup(transformGroup);
              //   panel.addGroup(colorGroup);
+             panel.addGroup(textGroup);// title 
                 panel.addGroup(rotateGroup);
 
             }
@@ -1013,7 +1051,8 @@
 
              }
          
-// -            createDefaultPipeline();
+         //    loadData();
+   //        createDefaultPipeline();
             createMeshLoop();
             setActionManagers();
          //   setShadow();
@@ -1027,8 +1066,9 @@
         //    load3Dgui();
         loadSelectionPanel();
 
-    //     scene.debugLayer.show();
+// --------         scene.debugLayer.show();
 
+             
             canvas.addEventListener("pointermove", onPointerMove, false);
             return scene;
         };
@@ -1057,6 +1097,9 @@
             engine.resize();
         });
     </script>
+
+<input type="button" value="Get From Local Storage" onclick="get()"/>
+
 </body>
 
 </html>
