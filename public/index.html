@@ -129,7 +129,10 @@
         let widerAmountX = 0.0;
         let widerAmountZ = 0.0;
         let impulseMagnitude = 7.0;
-        
+        let boxMass = 0.3; // 0.3
+        let boxFriction  = 0.15;    // 0.15;
+        let boxRestitution = 0.1;   // 0.1
+
         // data /////////////////////////////////////
 
 /*     function loadData() {
@@ -241,6 +244,7 @@ console.log("crateCountTotalGoal after getData is " + crateCountTotalGoal);
             //  var camera = new BABYLON.ArcRotateCamera("camera", 5, 8.0, 20.0, BABYLON.Vector3.Zero(), scene); // odd shadows
             //  var camera = new BABYLON.FreeCamera("camera1", new BABYLON.Vector3(0, 2, -8), scene);
             var camera = new BABYLON.ArcRotateCamera("camera", 1 * Math.PI / 3, Math.PI / 2.5, 100, BABYLON.Vector3.Zero(), scene);
+            camera.wheelDeltaPercentage = 0.09; // Zoom speed
             camera.setTarget(BABYLON.Vector3.Zero());
             // camera.speed = 0.1;
            // camera.Inertia = 0.0005;
@@ -469,10 +473,11 @@ console.log("crateCountTotalGoal after getData is " + crateCountTotalGoal);
                     var re = /box/gi;
                     var str = mesh.name;
                     if (str.search(re) == -1) {
-                        // console.log("Does not contain sequin");
+                        // console.log("Does not contain box");
                     } else {
-                        //console.log("Sequin named " + str + " is pickable " + mesh.isPickable);
-                        mesh.physicsImpostor = new BABYLON.PhysicsImpostor(mesh, BABYLON.PhysicsImpostor.BoxImpostor, { mass: 0.3, friction: 0.15, restitution: 0.1 }, scene);
+                        //console.log("box named " + str + " is pickable " + mesh.isPickable);
+                        //  mesh.physicsImpostor = new BABYLON.PhysicsImpostor(mesh, BABYLON.PhysicsImpostor.BoxImpostor, { mass: 0.3, friction: 0.15, restitution: 0.1 }, scene);
+                        mesh.physicsImpostor = new BABYLON.PhysicsImpostor(mesh, BABYLON.PhysicsImpostor.BoxImpostor, { mass: boxMass, friction: boxFriction, restitution: boxRestitution }, scene);
                     }
                 }
             }
