@@ -718,12 +718,14 @@ var makeTextPlane = function(text, color, size) {
         plane.material.backFaceCulling = false;
         plane.material.specularColor = new BABYLON.Color3(0, 0, 0);
         plane.material.diffuseTexture = dynamicTexture;
+        plane.rotation.y = 250.0;
+       // plane.rotation.x = 10.0;
         return plane;
     }; 
 
-makeTextPlane();
-*/
+makeTextPlane(text, color, size);
 
+ */
 
     //  material
 
@@ -738,13 +740,14 @@ makeTextPlane();
     let hoverColor = new BABYLON.StandardMaterial("hoverColor", scene);
     hoverColor.diffuseColor = new BABYLON.Color3(0.95, 0.91, 0.36);
     hoverColor.specularColor = new BABYLON.Color3(1.0, 1.0, 1.0);
+    hoverColor.emissiveColor = new BABYLON.Color3(1,1,1);
 
     let backgroundMaterial = new BABYLON.StandardMaterial("buttonCoreMaterial", scene);
     backgroundMaterial.diffuseColor = new BABYLON.Color3(0.27, 0.11, 0.11, 0.88);
     backgroundMaterial.specularColor = new BABYLON.Color3(1.0, 1.0, 1.0);
 
     var redMat = new BABYLON.StandardMaterial("red", scene);
-    redMat.emissiveColor = new BABYLON.Color3(1,0,0);
+    redMat.emissiveColor = new BABYLON.Color3(1,0,0); // (1,0,0)
 
 //  material
 
@@ -761,7 +764,8 @@ makeTextPlane();
     const buttonBodyDown = BABYLON.MeshBuilder.CreateCylinder("buttonBodyDown", { // TRY TUBE
         height:  0.2,
         diameterTop: 0.70,
-        tessellation: 3
+        tessellation: 3,
+        diameter: 2.5
     },scene);
     buttonBodyDown.position.x = 0.0;
     buttonBodyDown.position.y = 0.0;
@@ -771,10 +775,11 @@ makeTextPlane();
    const buttonBodyUp = BABYLON.MeshBuilder.CreateCylinder("buttonBodyUp", { // TRY TUBE
         height:  0.2,
         diameterTop: 0.70,
-        tessellation: 3
+        tessellation: 3,
+        diameter: 2.5
     },scene);
     buttonBodyUp.position.x = 0.0;
-    buttonBodyUp.position.y = 20.0;
+    buttonBodyUp.position.y = 0.0;
     buttonBodyUp.position.z = 0.0;
     buttonBodyUp.rotation.y = 45.0;
     buttonBodyUp.material = buttonBodyUpMaterial;
@@ -827,7 +832,7 @@ makeTextPlane();
         };
 
          pushButtonUp.pointerEnterAnimation = () => {
-           buttonBodyUp.material = redMat;
+           buttonBodyUp.material = redMat;//  hoverColor
         }; 
 
         pushButtonDown.pointerOutAnimation = () => {
@@ -850,7 +855,7 @@ makeTextPlane();
     panel.addControl(pushButtonUp);
    //pushButtonUp.rotation.x = 90;
 
-        pushButtonUp.position.x = -0.6;
+        pushButtonUp.position.x = -1.4; //  position.x = --1.2;
 
    //manager.addControl(pushButton);
     //    pushButton.linkToTransformNode(anchor);
@@ -892,7 +897,7 @@ background.material = backgroundMaterial;
                 //location.href = "2b-local-storage.html";
             }
 
-scene.debugLayer.show();
+// --- scene.debugLayer.show();
 //            loadSelectionPanel();
 //const3Dmenu();
 _set3dMeshMenu();
