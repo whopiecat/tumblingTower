@@ -196,7 +196,7 @@ console.log("crateCountTotalGoal after getData is " + crateCountTotalGoal);
         // data /////////////////////////////////////////
 
         //var createDefaultEngine = function () { return new BABYLON.Engine(canvas, true, { preserveDrawingBuffer: true, stencil: true,  disableWebGL2Support: false }); };
-        var createDefaultEngine = function () { return new BABYLON.Engine(canvas, true, { preserveDrawingBuffer: true, stencil: true }); };
+        var createDefaultEngine = function () { return new BABYLON.Engine(canvas, true, { preserveDrawingBuffer: true, stencil: true, disableWebGL2Support: false  }); };
 
         let createGround = function () {
             ground = BABYLON.MeshBuilder.CreateBox("ground", { width: 60, height: 1, depth: 60 }, scene);

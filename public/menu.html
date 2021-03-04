@@ -48,7 +48,7 @@
 
 </html>
 <!-- Babylon.js -->
-<script src="https://code.jquery.com/pep/0.4.2/pep.min.js"></script>
+<script src="https://code.jquery.com/pep/0.4.3/pep.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/dat-gui/0.6.2/dat.gui.min.js"></script>
 <script src="https://preview.babylonjs.com/ammo.js"></script>
 <script src="https://preview.babylonjs.com/cannon.js"></script>
@@ -118,26 +118,892 @@
 
 <body>
     <canvas id="renderCanvas"></canvas>
+    <!-- stop the default touch-action within the rendering canvas -->
+    <!-- https://doc.babylonjs.com/divingDeeper/scene/interactWithScenes#pointer-interactions -->
+    <!--canvas id="renderCanvas" touch-action="none"></canvas-->
     <script>
         var canvas = document.getElementById("renderCanvas");
         var sceneToRender = null;
         var button;
         value = 0;
-        // data /////////////////////////////////////////
+        let dynamicTexture = null;
+        let counterDisplay = 0;
+        let canvasColor = null;
+        //let hl = null;
+        let plane;
+        //Set font
+        var font_size = 48;
+        var font = "bold " + font_size + "px Arial";
+        let buttonBodyDownMaterial = null;
+        let pointerTarget = null;
+        let adjustedSlider1Value = null;
+        
 
-        /*     function saveData(user, pass) {
-                var account = {
-                    User: user,
-                    Pass: pass
+        var displayValueTotal = function (value) {
+            // adjust value to single 1.0, 2.0 verses 1.67536757675, 2.037673567
+            // return BABYLON.Tools.ToDegrees(value) | 0;
+            //return (value | 10);
+            // value = (Math.round(value * 10) / 10); // (Math.round(value * 10) / 10);
+            value = (Math.floor(value));
+            three = value;
+            //console.log("three set to " + value + " in displayValueTotal");
+            return value;
+        }
+
+
+
+         // DRAG ACTION //////////////////////////////////////////////
+                // Create pointerDragBehavior in the desired mode
+                //var pointerDragBehavior = new BABYLON.PointerDragBehavior({});
+                //var pointerDragBehavior = new BABYLON.PointerDragBehavior({dragPlaneNormal: new BABYLON.Vector3(0,1,0)});
+                // var pointerDragBehavior = new BABYLON.PointerDragBehavior({dragAxis: new BABYLON.Vector3(1,0,0)}); // horizional  on plane
+               // var pointerDragBehavior = new BABYLON.PointerDragBehavior({ dragAxis: new BABYLON.Vector3(0, 0, 1) }); // vertical on plane
+
+                // Use drag plane in world space
+/*                 pointerDragBehavior.useObjectOrientationForDragging = false;
+
+                // Listen to drag events
+                pointerDragBehavior.onDragStartObservable.add((event) => {
+                    console.log("dragStart");
+                    console.log(event);
+                })
+                pointerDragBehavior.onDragObservable.add((event) => {
+                    console.log("drag");
+                    // console.log("x position " + getMeshByName("sliderBody").position.x);
+                    console.log(event);
+                })
+                pointerDragBehavior.onDragEndObservable.add((event) => {
+                    console.log("dragEnd");
+                    console.log(event);
+                }) */
+
+                // If handling drag events manually is desired, set move attached to false
+                // pointerDragBehavior.moveAttached = false;
+
+              //  sliderBody.addBehavior(pointerDragBehavior);
+              //     sliderTop.addBehavior(pointerDragBehavior);
+              // DRAG ACTION //////////////////////////////////////////////
+
+
+        //var createDefaultEngine = function () { return new BABYLON.Engine(canvas, true, { preserveDrawingBuffer: true, stencil: true,  disableWebGL2Support: false }); };
+        var createDefaultEngine = function () { return new BABYLON.Engine(canvas, true, { preserveDrawingBuffer: true, stencil: true,  disableWebGL2Support: false  }); };
+
+
+        var createScene = async function () {
+            var scene = new BABYLON.Scene(engine);
+            scene.clearColor = new BABYLON.Color3(.5, .5, .5);
+            //    var camera = new BABYLON.ArcRotateCamera("camera", 1 * Math.PI / 3, Math.PI / 2.5, 100, BABYLON.Vector3.Zero(), scene);
+            //const camera = new BABYLON.ArcRotateCamera("camera", Math.PI / 2, Math.PI / 2, 4, BABYLON.Vector3.Zero(), scene);
+            // const camera = new BABYLON.ArcRotateCamera("camera", 0.0, 1.0, 8, BABYLON.Vector3.Zero(), scene);
+            const camera = new BABYLON.ArcRotateCamera("camera", 0.0, 0.0, 10.0, BABYLON.Vector3.Zero(), scene);
+            camera.setTarget(BABYLON.Vector3.Zero());
+
+            camera.attachControl(canvas, true);
+         //   camera.lowerRadiusLimit = 5;
+          //  camera.upperRadiusLimit = 30;
+            
+
+
+            var light = new BABYLON.HemisphericLight("sun", new BABYLON.Vector3(0, 1, 0), scene);
+            light.intensity = 0.6;
+
+            hl = new BABYLON.HighlightLayer("hl1", scene);
+
+            let pointerDragBehavior = new BABYLON.PointerDragBehavior({ dragAxis: new BABYLON.Vector3(0, 0, 1) }); // vertical on plane
+            // Use drag plane in world space
+            pointerDragBehavior.useObjectOrientationForDragging = false;
+
+
+
+                 //  MATERIALS ////////////////////////////////////////////////////////////////////////////
+
+                buttonBodyDownMaterial = new BABYLON.StandardMaterial("buttonBodyDownMaterial", scene);
+                buttonBodyDownMaterial.diffuseColor = new BABYLON.Color3(0, 0.64, 0.8);//0.5, 0.19, 0
+                buttonBodyDownMaterial.specularColor = new BABYLON.Color3(1.0, 1.0, 1.0);
+
+                sliderTopMaterial = new BABYLON.StandardMaterial("sliderTopMaterial", scene);
+                sliderTopMaterial.diffuseColor = new BABYLON.Color3(0.0, 0.64, 0.8);//0.5, 0.19, 0
+                sliderTopMaterial.specularColor = new BABYLON.Color3(1.0, 1.0, 1.0);
+
+/*                 sliderLowerMaterial = new BABYLON.StandardMaterial("sliderLowerMaterial", scene);
+                sliderLowerMaterial.diffuseColor = new BABYLON.Color3(0, 0.64, 0.8);//0.5, 0.19, 0
+                sliderLowerMaterial.specularColor = new BABYLON.Color3(1.0, 1.0, 1.0); */
+
+                let buttonBodyUpMaterial = new BABYLON.StandardMaterial("buttonBodyUpMaterial", scene);
+                buttonBodyUpMaterial.diffuseColor = new BABYLON.Color3(0, 0.64, 0.8);//0.5, 0.19, 0
+                buttonBodyUpMaterial.specularColor = new BABYLON.Color3(1.0, 1.0, 1.0);
+
+/*                 let hoverColor = new BABYLON.StandardMaterial("hoverColor", scene);
+                hoverColor.diffuseColor = new BABYLON.Color3(0.95, 0.91, 0.36);
+                hoverColor.specularColor = new BABYLON.Color3(1.0, 1.0, 1.0);
+                hoverColor.emissiveColor = new BABYLON.Color3(1, 1, 1); */
+
+                let backgroundMaterial = new BABYLON.StandardMaterial("backgroundMaterial", scene);
+                backgroundMaterial.diffuseColor = new BABYLON.Color3(0.27, 0.11, 0.11, 0.88);
+                backgroundMaterial.specularColor = new BABYLON.Color3(1.0, 1.0, 1.0);
+
+                var redMat = new BABYLON.StandardMaterial("red", scene);
+                redMat.emissiveColor = new BABYLON.Color3(0, 0.34, 0.8); // (1,0,0)
+                //redMat.emissiveColor = new BABYLON.Color3(0.95, 0.91, 0.36);
+                redMat.intensity = 0.01;
+
+                let dynamicCount = new BABYLON.StandardMaterial("TextPlaneMaterial", scene);
+                dynamicCount.backFaceCulling = false;
+                dynamicCount.specularColor = new BABYLON.Color3(0, 0, 0);
+                dynamicCount.diffuseTexture = dynamicTexture;
+
+                canvasColor = buttonBodyUpMaterial;
+
+                // material for Slider1 text info
+                //var matSlider1 = new BABYLON.StandardMaterial("matSlider1", scene);
+
+                //  MATERIALS //////////////////////////////////////////////////////////////////////////// */
+
+            scene.onPointerObservable.add((pointerInfo) => {
+                switch (pointerInfo.type) {
+                    case BABYLON.PointerEventTypes.POINTERDOWN://POINTERUP:
+                        if (pointerInfo.pickInfo.hit) {
+                            pointerTarget = pointerInfo.pickInfo.pickedMesh; // pickInfo.pickedMesh.name
+                            console.log(" ---------- pointerInfo.pickInfo.pickedMesh.name ---------- " + pointerInfo.pickInfo.pickedMesh.name );
+                            console.log(" ---------- on onPointerObservable - pointerTarget ---------- " + pointerTarget); // 
+                            //gizmoManager.attachToMesh(pointerInfo.pickInfo.pickedMesh);
+                            return pointerTarget;
+                        }
+                        break;
+                }
+            });
+
+
+                           // TEXT ON PLANE 2 = slider1 (maybe blockGoal) info text plane
+                           let textResizePlaneSlider1 = function () {
+                    if (scene.getMeshByName("planeSlider1")) {
+                        scene.getMeshByName("planeSlider1").dispose();
+                    }
+                    //let matSlider1 = new BABYLON.StandardMaterial("matSlider1", scene);
+
+                    //Set font
+                    font_size = 48;
+                    font = "bold " + font_size + "px Arial";
+                    //Set height for planeSlider1
+                    var planeHeight = 0.4;    // 0.4;
+                    //Set height for dynamic texture
+                    var DTHeight = 1.0 * font_size; //or set as wished // 1.0 * font_size;
+                    //Calcultae ratio
+                    var ratio = planeHeight / DTHeight;
+                    //Set text
+                    //var text = "";
+                    var text = adjustedSlider1Value;// "100"
+                    //Use a temporay dynamic texture to calculate the length of the text on the dynamic texture canvas
+                    var temp = new BABYLON.DynamicTexture("DynamicTexture", 64, scene);
+                    var tmpctx = temp.getContext();
+                    tmpctx.font = font;
+                    var DTWidth = tmpctx.measureText(text).width + 8;
+                    //Calculate width the planeSlider1 has to be 
+                    var planeWidth = DTWidth * ratio;
+                    //Create dynamic texture and write the text
+                    dynamicTextureSlider1 = new BABYLON.DynamicTexture("dynamicTextureSlider1", { width: DTWidth, height: DTHeight }, scene, false);
+                    var dynamicTextureContext = dynamicTextureSlider1.getContext();
+                    dynamicTextureSlider1.hasAlpha = true;
+                   // if (scene.getMaterialByName("matSlider1") === false) {
+                    let matSlider1 = new BABYLON.StandardMaterial("matSlider1", scene);
+                    matSlider1.diffuseTexture = dynamicTextureSlider1;
+                  //  }  
+                    
+
+                   // text = adjustedSlider1Value;
+                    //// (method) CanvasText.fillText(text: string, x: number, y: number, maxWidth?: number): void
+                    dynamicTextureSlider1.drawText(text, null, null, font, "#ffffff", "transparent", true, true);
+                    //------       dynamicTextureSlider1.drawText(text, null, null, font, "#ffffff", null, true);
+                    //Create planeSlider1 and set dynamic texture as material
+                    planeSlider1 = BABYLON.MeshBuilder.CreatePlane("planeSlider1", { width: planeWidth, height: planeHeight }, scene);
+                    planeSlider1.rotation.y = 29.85;  // 29.8    // rotate
+                    planeSlider1.rotation.x = 20.4204;  // 20.4204; // tilt to and away from camera
+                    planeSlider1.position.y = 3.160; //  0.160;   // up
+                    planeSlider1.position.x = -1.40;   // -1.42;
+                    planeSlider1.material = matSlider1;
+                   // scene.getMaterialByName("matSlider1").dispose();
+                }
+                textResizePlaneSlider1();
+                // TEXT ON PLANE 2 = slider1 (maybe blockGoal) info text plane
+
+   
+            let adjustSlider1Value = function (value) {
+/*                 Math.round() - rounds to the nearest integer
+                Math.floor() - rounds down towards negative infinity
+                Math.ceil() - rounds up towards positive infinity
+                Math.trunc() - rounds up or down towards zero(bad browsers support) */
+                //console.log("adjusting . . . ");
+            // adjust value to single 1.0, 2.0 verses 1.67536757675, 2.037673567
+           //  return BABYLON.Tools.ToDegrees(value) | 0;
+           // return (value | 10);
+            // value = (Math.round(value * 10) / 10); // (Math.round(value * 10) / 10);
+         // value = (Math.floor(value));
+            //three = value;
+            //value =  (value * 100000000000000000);
+            // value = (Math.round(value  / 100000000000000));
+            // value = (value * 100000000000000000000000000000);
+           // value = value.parseFloat(x).toPrecision(4);
+            //console.log("--------------- displaySliderValue ----------" + value );
+          //  return value;
+          adjustedValue = (value * 1000000000000000000);
+          adjustedValue = Math.ceil(adjustedValue);
+         // adjustedValue = (Math.floor(adjustedValue));
+        adjustedSlider1Value = adjustedValue.toString().slice(-4); // cast to String so may need parse(int)
+
+         // console.log(" ----- adjustedSlider1Value ------ " + adjustedSlider1Value);
+          return adjustedSlider1Value;
+        }
+
+
+      // Listen to drag events
+            pointerDragBehavior.onDragStartObservable.add((event) => {
+               // pointerTarget = pointerInfo.pickInfo.hit;
+                console.log("dragStart");
+             //  console.log(" ---------------- try for mesh name ---------------- " + pointerTarget); 
+            //   console.log(" ---------------- name  ---------------- " + pickInfo.pickedMesh.name);
+                //console.log(event);
+             //   console.log(" ----------on dragStasrt- pointerInfo.pickInfo.pickedMesh ---------- " + pointerInfo.pickInfo.pickedMesh.name);
+                //hl.addMesh(sliderTop, BABYLON.Color3.Red());
+                
+            })
+
+
+
+
+
+
+            pointerDragBehavior.onDragObservable.add((event) => {
+                console.log("drag");
+                console.log("IS VARIABLE AVAIL " + pointerTarget);
+                if (scene.getMaterialByName("matSlider1")) {
+                        scene.getMaterialByName("matSlider1").dispose();
+                    }
+
+                // console.log("x position " + getMeshByName("sliderBody").position.x);
+             //   console.log(event);
+               // console.log(" ---------------- event.dragDistance ---------------- " + event.dragDistance);
+              console.log(" ----------------  event.dragPlanePoint.x ---------------- " + event.dragPlanePoint.x);
+                // pointerInfo.pickInfo.hit); 
+                //hl.addMesh(event.pointerId, BABYLON.Color3.Red());
+               // originalValue = event.dragPlanePoint.x
+               // value = adjustSlider1Value(originalValue);
+                //console.log(displaySliderValue("event.dragPlanePoint.x ADJUSTED " + value));
+             //   console.log(precise("" + event.dragPlanePoint.x));
+                // if (event.dragPlanePoint.x >= 0.0017463212863768895)  {
+                //     console.log(" ##########------------########### left edge reached ##########------------########### ")
+                    //sliderTop.position.x = 0.0017463212863768895;
+                    // display to text planeSlider1
+                    // -- WORKS RAW -- adjustedSlider1Value = pointerTarget.getBoundingInfo().boundingBox.centerWorld.z; // .toFixed(2)
+                    adjustedSlider1Value = pointerTarget.getBoundingInfo().boundingBox.centerWorld.z.toFixed(2);
+                 //   console.log("----- " + pointerInfo.pickInfo.pickedMesh.name);
+                    // console.log("----- position x --------- " + pointerTarget.getPositionExpressedInLocalSpace);
+                    //mesh.getBoundingInfo().boundingBox.center is in object space
+                    //mesh.getBoundingInfo().boundingBox.centerWorld is in world space
+                    //console.log("----- world space --------- " + (Math.floor(pointerTarget.getBoundingInfo().boundingBox.centerWorld.z)));
+                    console.log("----- world space --------- " + (Math.round(pointerTarget.getBoundingInfo().boundingBox.centerWorld.z)));
+                    // example output   ----- world space --------- {X: 0 Y:0 Z:0.15662738680839539}
+
+                  //  console.log("----- object space --------- " + pointerTarget.getBoundingInfo().boundingBox.center);
+                   // console.log("----- junk --------- " + getMeshByName("sliderTop").position.x);
+                   
+                    textResizePlaneSlider1();
+                }
+
+               //  }
+          //  }
+           )
+
+
+
+
+            pointerDragBehavior.onDragEndObservable.add((event) => {
+                console.log("dragEnd");
+                //console.log(event);
+               // hl.removeMesh(sliderTop, BABYLON.Color3.Red());
+            })
+
+
+
+
+/* 
+            scene.onPointerObservable.add((pointerInfo) => {
+                switch (pointerInfo.type) {
+                    case BABYLON.PointerEventTypes.POINTERDOWN:
+                        console.log("POINTER DOWN");
+                        console.log(" ---------- pointerInfo.pickInfo.pickedMesh ---------- " + pointerInfo.pickInfo.pickedMesh);
+                        console.log(" ---------- pointerInfo.pickInfo.pickedMesh ---------- " + pointerInfo.pickInfo.pickedMesh["Name"]);
+                        break;
+                    case BABYLON.PointerEventTypes.POINTERUP:
+                        console.log("POINTER UP");
+                        break;
+                    case BABYLON.PointerEventTypes.POINTERMOVE:
+                        console.log("POINTER MOVE");
+                        break;
+                    case BABYLON.PointerEventTypes.POINTERWHEEL:
+                        console.log("POINTER WHEEL");
+                        break;
+                    case BABYLON.PointerEventTypes.POINTERPICK:
+                        console.log("POINTER PICK");
+                        break;
+                    case BABYLON.PointerEventTypes.POINTERTAP:
+                        console.log("POINTER TAP");
+                        break;
+                    case BABYLON.PointerEventTypes.POINTERDOUBLETAP:
+                        console.log("POINTER DOUBLE-TAP");
+                        break;
+                }
+            });
+
+ */
+
+
+
+
+            // GUI - //
+            var loadSelectionPanel = function () {
+
+
+                var advancedTexture = BABYLON.GUI.AdvancedDynamicTexture.CreateFullscreenUI("UImenu");
+                advancedTexture.rootContainer.scaleX = window.devicePixelRatio;
+                advancedTexture.rootContainer.scaleY = window.devicePixelRatio;
+
+                // number of blocks
+                var totalValue = new BABYLON.GUI.SliderGroup("Height", "S");
+                totalValue.zIndex = 3;
+                totalValue.horizontalAlignment = BABYLON.GUI.Control.HORIZONTAL_ALIGNMENT_CENTER;
+                totalValue.verticalAlignment = BABYLON.GUI.Control.VERTICAL_ALIGNMENT_CENTER;
+                totalValue.addSlider("Total Blocks", setTotalBlocks, " ", 6, 84, 30, displayValueTotal)
+                totalValue.width = '90%';
+                // number of blocks
+
+                // friction
+                var totalFriction = new BABYLON.GUI.SliderGroup("Friction", "S");
+                totalFriction.zIndex = 3;
+                totalFriction.horizontalAlignment = BABYLON.GUI.Control.HORIZONTAL_ALIGNMENT_CENTER;
+                totalFriction.verticalAlignment = BABYLON.GUI.Control.VERTICAL_ALIGNMENT_CENTER;
+                totalFriction.addSlider("Force between bodies", setTotalFriction, " ", 6, 84, 30, displayValueTotal)
+                totalFriction.width = '90%';
+                // friction
+
+                // mass
+                var totalMass = new BABYLON.GUI.SliderGroup("Mass", "S");
+                totalMass.zIndex = 3;
+                totalMass.horizontalAlignment = BABYLON.GUI.Control.HORIZONTAL_ALIGNMENT_CENTER;
+                totalMass.verticalAlignment = BABYLON.GUI.Control.VERTICAL_ALIGNMENT_CENTER;
+                totalMass.addSlider("Total Matter", setTotalMass, " ", 6, 84, 30, displayValueTotal)
+                totalMass.width = '90%';
+                // mass
+
+
+
+                var panel = new BABYLON.GUI.SelectionPanel("panel");
+                panel.fontSize = 20;
+                panel.width = 0.35;//   0.25;
+                panel.height = 0.40;//0.25;
+                panel.thickness = 4;
+                panel.horizontalAlignment = BABYLON.GUI.Control.HORIZONTAL_ALIGNMENT_CENTER;
+                panel.verticalAlignment = BABYLON.GUI.Control.VERTICAL_ALIGNMENT_CENTER;
+                panel.zIndex = 1;
+                /* Change Color Scheme  */
+                panel.color = "orange";// blue
+                panel.background = "#336699"; // "#0394fc"
+                panel.barColor = "orange"; // "#4F7DF2"
+                panel.headerColor = "white";
+                panel.buttonColor = "orange";
+                panel.buttonBackground = "#684502"
+                panel.isVertical = true;
+
+
+
+                // TITLE ////////////////////////////////////////////////
+
+                let loadTitle = function () {
+                    var titleRectangle = new BABYLON.GUI.Rectangle('');
+                    titleRectangle.width = 0.35;    //  .width = 0.35;
+                    titleRectangle.height = .1;
+                    titleRectangle.top = -285;// -285; 
+                    titleRectangle.thickness = 4;
+                    titleRectangle.color = "orange";
+                    titleRectangle.background = "#336699";
+                    titleRectangle.horizontalAlignment = BABYLON.GUI.Control.HORIZONTAL_ALIGNMENT_CENTER;
+                    titleRectangle.verticalAlignment = BABYLON.GUI.Control.VERTICAL_ALIGNMENT_TOP;
+                    advancedTexture.addControl(titleRectangle);
+
+                    var title = new BABYLON.GUI.TextBlock();
+                    title.color = "white";
+                    title.outlineWidth = 5.6;
+                    title.outlineColor = "black";
+                    title.lineSpacing = 1;
+                    title.textWrapping = true;
+                    title.textHorizontalAlignment = 2;// 1 = right, 2 = center, 3 = left
+                    title.textVerticalAlignment = 2;// 1 = bottom, 2 = center, 3 = ?
+                    title.fontStyle = "italic";
+                    title.fontFamily = "Verdana";
+                    title.fontSize = 26;
+                    // title.fontSize = "100%";
+                    title.text = "Tumbling Tower";
+                    titleRectangle.zIndex = 2;
+                    titleRectangle.addControl(title);
+                    title.onLinesReadyObservable.add(() => {
+                        var textHeight = (title.fontOffset.height) * title.lines.length;
+                        var ratioHeights = title.parent.heightInPixels / textHeight;
+                        var textWidth = title.lines[0].width;
+                        var ratioWidths = title.parent.widthInPixels / textWidth;
+                        if (ratioWidths < 1) {
+                            title.fontSize = parseFloat(title.fontSizeInPixels) * ratioWidths + "px";
+                        }
+                    });
+                }
+
+                // DIRECTIONS ////////////////////////////////////////////////
+
+                let loadDirections = function () {
+                    var directionsRectangle = new BABYLON.GUI.Rectangle('');
+                    directionsRectangle.width = .35;    // .width = 0.35;
+                    directionsRectangle.height = .10;//.10
+                    directionsRectangle.top = -208;//-208; // go bigger negative number to move up
+                    directionsRectangle.thickness = 4;
+                    directionsRectangle.color = "orange";
+                    advancedTexture.addControl(directionsRectangle);
+
+                    var directions = new BABYLON.GUI.TextBlock();
+                    directions.color = "white";
+                    directions.outlineWidth = 5.6;
+                    directions.outlineColor = "black";
+                    directions.lineSpacing = 1;
+                    directions.textWrapping = true;
+                    directions.textHorizontalAlignment = 2;// 1 = right, 2 = center, 3 = left
+                    directions.textVerticalAlignment = 2;// 1 = bottom, 2 = center, 3 = ?
+                    directions.fontStyle = "italic";
+                    directions.fontFamily = "Verdana";
+                    directions.fontSize = 20;
+                    // directions.fontSize = "100%";
+                    directions.text = "Adjust Tower building settings";
+                    directionsRectangle.zIndex = 2;
+                    directionsRectangle.addControl(directions);
+                    directions.onLinesReadyObservable.add(() => {
+                        var textHeight = (directions.fontOffset.height) * directions.lines.length;
+                        var ratioHeights = directions.parent.heightInPixels / textHeight;
+                        var textWidth = directions.lines[0].width;
+                        var ratioWidths = directions.parent.widthInPixels / textWidth;
+                        if (ratioWidths < 1) {
+                            directions.fontSize = parseFloat(directions.fontSizeInPixels) * ratioWidths + "px";
+                        }
+                    });
+                }
+
+                // SPACER ////////////////////////////////////////////////
+
+        //        loadTitle();
+        //        loadDirections();
+
+         //       panel.addGroup(totalValue); // total block count >> move by changing panel height
+         //       panel.addGroup(totalFriction);
+         //       panel.addGroup(totalMass);
+
+
+
+                var setTotalBlocks = function (value) {
+                    // sets the blocks count based on value
+                    crateCountTotalGoal = value;
+                    //console.log("setImpulse value " + value );
+                    return crateCountTotalGoal;
+                }
+
+                var setTotalFriction = function (value) {
+                    // sets the friction based on value
+                    //  crateCountTotalGoal = value;
+                    //console.log("setImpulse value " + value );
+                    //   return crateCountTotalGoal;
+                }
+
+                var setTotalMass = function (value) {
+                    // sets the mass based on value
+                    //  crateCountTotalGoal = value;
+                    //console.log("setImpulse value " + value );
+                    //   return crateCountTotalGoal;
+                }
+            }
+
+
+            let GUIslider = function () {
+                // MESH SLIDER /////////////////////////////////////////////////////////////
+ 
+                // GROUP SLIDER //////////////////////////////////////////////
+              //  var sliderMidNode = new BABYLON.TransformNode("sliderMidNode");
+              //  sliderMidNode.parent = sliderBody; // midNode child of body
+             //   sliderTop.parent = sliderMidNode; // top child of body
+                // GROUP SLIDER //////////////////////////////////////////////  
+
+            }
+            
+
+
+            let _set3dMeshMenu = function () {
+                var anchor = new BABYLON.TransformNode("transformNode");
+                var manager = new BABYLON.GUI.GUI3DManager(scene);
+                var panel = new BABYLON.GUI.StackPanel3D();
+
+                // REFERENCE https://doc.babylonjs.com/divingDeeper/gui/gui3D#gui3dmanager
+                manager.addControl(panel);
+
+
+                let text = null;
+                let color = null;
+                let size = null;
+
+                 // TEXT ON PLANE 1 = button info text plane
+                var makeTextPlane = function (text, color, size) {
+                    dynamicTexture = new BABYLON.DynamicTexture("DynamicTexture", 50, scene, true);
+                    dynamicTexture.hasAlpha = true;
+                    dynamicTexture.drawText(text, 5, 40, "bold 36px Arial", color, "transparent", true);
+
                 };
-                //converts to JSON string the Object
-                account = JSON.stringify(account);
-                //creates a base-64 encoded ASCII string
-                account = btoa(account);
-                //save the encoded accout to web storage
-                localStorage.setItem('_account', account);
-            } */
+                makeTextPlane(text, color, size);
 
+                let textButton1info = function () {
+                    if (scene.getMeshByName("textButton1info_plane")) {// plane
+                        scene.getMeshByName("textButton1info_plane").dispose();
+                    }
+                    if (scene.getMaterialByName("mat")) {
+                        scene.getMaterialByName("mat").dispose();
+                    }
+                    //Set font
+                    font_size = 48;
+                    font = "bold " + font_size + "px Arial";
+                    //Set height for plane
+                    var planeHeight = 0.4;    // 0.4;
+                    //Set height for dynamic texture
+                    var DTHeight = 1.0 * font_size; //or set as wished // 1.0 * font_size;
+                    //Calcultae ratio
+                    var ratio = planeHeight / DTHeight;
+                    //Set text
+                    //var text = "";
+                    var text = counterDisplay;// "100"
+                    //Use a temporay dynamic texture to calculate the length of the text on the dynamic texture canvas
+                    var temp = new BABYLON.DynamicTexture("DynamicTexture", 64, scene);
+                    var tmpctx = temp.getContext();
+                    tmpctx.font = font;
+                    var DTWidth = tmpctx.measureText(text).width + 8;
+                    //Calculate width the plane has to be 
+                    var planeWidth = DTWidth * ratio;
+                    //Create dynamic texture and write the text
+                    dynamicTexture = new BABYLON.DynamicTexture("DynamicTexture", { width: DTWidth, height: DTHeight }, scene, false);
+                    var dynamicTextureContext = dynamicTexture.getContext();
+                    dynamicTexture.hasAlpha = true;
+                    var mat = new BABYLON.StandardMaterial("mat", scene);
+                    mat.diffuseTexture = dynamicTexture;
+
+                    text = counterDisplay;
+                    //// (method) CanvasText.fillText(text: string, x: number, y: number, maxWidth?: number): void
+                    dynamicTexture.drawText(text, null, null, font, "#ffffff", "transparent", true, true);
+                    //------       dynamicTexture.drawText(text, null, null, font, "#ffffff", null, true);
+                    //Create plane and set dynamic texture as material
+                    textButton1info_plane = BABYLON.MeshBuilder.CreatePlane("textButton1info_plane", { width: planeWidth, height: planeHeight }, scene);
+                    textButton1info_plane.rotation.y = 29.8;  // 29.8
+                    textButton1info_plane.rotation.x = 20.4204;  // 20.4204; 
+                    textButton1info_plane.position.y = 0.160; //  0.160;   // up
+                    textButton1info_plane.position.x = -1.40;   // -1.42;
+                    textButton1info_plane.material = mat;
+                }
+                textButton1info();
+                // TEXT ON PLANE 1 = button info text plane
+
+              
+
+
+                // TEXT ON PLANE 3 = planeTitle1 info text plane display Title
+                let textResizePlaneTitle1 = function () {
+                    if (scene.getMeshByName("planeSlider1")) {
+                        scene.getMeshByName("planeSlider1").dispose();
+                    }
+                    //Set font
+                    font_size = 48;
+                    font = "bold " + font_size + "px Arial";
+                    //Set height for planeSlider1
+                    var planeHeight = 0.4;    // 0.4;
+                    //Set height for dynamic texture
+                    var DTHeight = 1.0 * font_size; //or set as wished // 1.0 * font_size;
+                    //Calcultae ratio
+                    var ratio = planeHeight / DTHeight;
+                    //Set text
+                    //var text = "";
+                   // var text = adjustedSlider1Value;// "100"
+                   var text = "Tumbling Towers Settings"
+                    //Use a temporay dynamic texture to calculate the length of the text on the dynamic texture canvas
+                    var temp = new BABYLON.DynamicTexture("DynamicTexture", 64, scene);
+                    var tmpctx = temp.getContext();
+                    tmpctx.font = font;
+                    var DTWidth = tmpctx.measureText(text).width + 8;
+                    //Calculate width the planeSlider1 has to be 
+                    var planeWidth = DTWidth * ratio;
+                    //Create dynamic texture and write the text
+                    dynamicTexture = new BABYLON.DynamicTexture("dynamicTexture", { width: DTWidth, height: DTHeight }, scene, false);
+                    var dynamicTextureContext = dynamicTexture.getContext();
+                    dynamicTexture.hasAlpha = true;
+                    var mat = new BABYLON.StandardMaterial("mat", scene);
+                    mat.diffuseTexture = dynamicTexture;
+                    //// (method) CanvasText.fillText(text: string, x: number, y: number, maxWidth?: number): void
+                    dynamicTexture.drawText(text, null, null, font, "#ffffff", "transparent", true, true);
+                    //------       dynamicTexture.drawText(text, null, null, font, "#ffffff", null, true);
+
+                    planeTitle1 = BABYLON.MeshBuilder.CreatePlane("planeSlider1", { width: planeWidth, height: planeHeight }, scene);
+                    planeTitle1.rotation.y = 29.85;  // 29.8    // rotate
+                    planeTitle1.rotation.x = 20.4204;  // 20.4204; // tilt to and away from camera
+                    planeTitle1.position.y = 5.0; //  0.160;   // up
+                    planeTitle1.position.x = -1.40;   // -1.42;
+                    planeTitle1.material = mat;
+                }
+             //   textResizePlaneTitle1();
+                // TEXT ON PLANE 3 = planeTitle1 info text plane display Title
+
+
+
+
+
+
+
+
+
+
+                //  MESH BACKGROUND ////////////////////////////////////////////////////////////////////////////
+
+                let background = BABYLON.MeshBuilder.CreateBox("background", { width: 10, height: 0.05, depth: 5 }, scene) // width: 10, height: 0.1, depth: 5
+                background.material = backgroundMaterial;
+                background.position.x = 0.0;
+                background.position.y = 0.0; // -0.329
+                background.position.z = 0.0;
+                background.isPickable = false;
+
+                // MESH BACKGROUND ////////////////////////////////////////////////////////////////////////////
+
+
+
+
+                // MESH BUTTON //////////////////////////////////////////////////////////////////////////
+                const buttonBodyDown = BABYLON.MeshBuilder.CreateCylinder("buttonBodyDown", { // TRY TUBE
+                    height: 0.3,
+                    diameterTop: 1.0,// 0.70,
+                    tessellation: 3,
+                    diameter: 2.5
+                }, scene);
+                buttonBodyDown.position.x = 0.0;
+                buttonBodyDown.position.y = 0.0;
+                buttonBodyDown.position.z = 0.0;
+                buttonBodyDown.material = buttonBodyDownMaterial;
+
+
+                const buttonBodyUp = BABYLON.MeshBuilder.CreateCylinder("buttonBodyUp", { // TRY TUBE
+                    height: 0.3,
+                    diameterTop: 1.0,
+                    tessellation: 3,
+                    diameter: 2.5
+                }, scene);
+                buttonBodyUp.position.x = 0.0;//0.0
+                buttonBodyUp.position.y = 0.0;
+                buttonBodyUp.position.z = 0.032;// side to side, a bit right from top view
+                buttonBodyUp.rotation.y = 45.0;
+                buttonBodyUp.material = buttonBodyUpMaterial;
+
+/* 
+                const sliderLower = BABYLON.MeshBuilder.CreateCylinder("sliderLower", { // TRY TUBE
+                    height: 0.3,
+                    diameterTop: 0.28,
+                    tessellation: 6,
+                    subdivisions: 1,
+                    arc: 1.0,
+                    diameter: 0.10
+                }, scene);
+                sliderLower.position.y = -0.05;
+                sliderLower.rotation.y = 100.0; // 100.0;
+                sliderLower.material = sliderLowerMaterial; */
+
+
+                const sliderTop = BABYLON.MeshBuilder.CreateSphere("sliderTop", { diameterX: 0.25, diameterY: 0.15, diameterZ: 0.6, segments: 2 });
+/*                 const sliderTop = BABYLON.MeshBuilder.CreateCylinder("sliderTop", {
+                    height: 0.2,
+                    diameterTop: 0.18,// 0.70,
+                    tessellation: 6,
+                    diameter: 0.5 */
+                //}, scene);
+                sliderTop.rotation.y = 89.5;
+                sliderTop.material = sliderTopMaterial;
+
+                sliderTop.addBehavior(pointerDragBehavior);
+                //hl.addMesh(sliderTop, BABYLON.Color3.Red());
+
+/*                 // GROUP SLIDER //////////////////////////////////////////////
+                var sliderMidNode = new BABYLON.TransformNode("sliderMidNode");
+                sliderMidNode.parent = sliderLower; // base to mid
+                sliderTop.parent = sliderMidNode; // mid to top
+                // GROUP SLIDER ////////////////////////////////////////////// */
+
+/*                 // The id of the pointer that is currently interacting with the behavior (-1 when no pointer is active)
+                pointerDragBehavior.currentDraggingPointerID;
+                // The last position where the pointer hit the drag plane in world space
+                pointerDragBehavior.lastDragPosition;
+                // If the behavior is currently in a dragging state
+                pointerDragBehavior.dragging; */
+
+                // Make Buttons /////////////////////////////////////////////
+                let pushButtonDown = new BABYLON.GUI.MeshButton3D(buttonBodyDown, "buttonBodyDown");
+                let pushButtonUp = new BABYLON.GUI.MeshButton3D(buttonBodyUp, "buttonBodyUp");
+
+               // sliderTop.addBehavior(pointerDragBehavior);
+             //   let pushSliderTop = new BABYLON.GUI.MeshButton3D(sliderTop, "sliderTop");
+                
+
+                // Make Buttons /////////////////////////////////////////////
+
+                // Clone Materials ///////////////////////////////////////
+                let buttonBodyDownMat = buttonBodyDown.material.clone();
+                let buttonBodyUpMat = buttonBodyUp.material.clone();
+                buttonBodyUp.material = buttonBodyUpMat;
+                
+               // let sliderTopMatClone = sliderTop.material.clone();
+                // Clone Materials ///////////////////////////////////////
+
+
+                
+
+                _incrementCounter = function () {
+                    counterDisplay++;
+                    if (counterDisplay >= 80) {
+                        counterDisplay = "80";
+                    }
+                    return counterDisplay;
+                }
+
+                _decrementCounter = function () {
+                    counterDisplay--;
+                    if (counterDisplay <= 0) {
+                        counterDisplay = "0";
+                    }
+                    return counterDisplay;
+                }
+
+
+
+                // MESH BUTTON //////////////////////////////////////////////////////////////////////////
+                // REFERENCE PointerDragBehavior  https://playground.babylonjs.com/#YEZPVT
+
+                // BUTTON UP //////////////////////////////////////////////
+                // ROLL OVER /////////////////////////////////////////////
+
+                pushButtonUp.pointerEnterAnimation = () => {
+                    buttonBodyUp.material = redMat;
+                    
+                };
+
+
+                pushButtonUp.pointerOutAnimation = () => {
+                    buttonBodyUp.material = buttonBodyUpMat;
+                    //hl.removeMesh(buttonBodyUp, BABYLON.Color3.Red());
+                    hl.removeMesh(plane, BABYLON.Color3.Green());
+                    // hl.removeMesh(buttonBodyUp, BABYLON.Color3.Green());
+                };
+
+                // ROLL OVER /////////////////////////////////////////////
+
+                // MOUSE ACTION ////////////////////////////////////
+                pushButtonUp.onPointerDownObservable.add(() => {
+                    console.log("Up pushed.");
+                    hl.addMesh(buttonBodyUp, BABYLON.Color3.Red());
+                    counterDisplay = _incrementCounter();
+                    textButton1info(counterDisplay);
+
+                });
+
+                pushButtonUp.onPointerUpObservable.add(() => {
+                    console.log("Up released.");
+                    hl.removeMesh(buttonBodyUp, BABYLON.Color3.Red());
+
+
+                });
+
+                // MOUSE ACTION ////////////////////////////////////
+                // BUTTON UP //////////////////////////////////////////////
+
+
+
+
+                // BUTTON DOWN //////////////////////////////////////////////
+                // ROLL OVER /////////////////////////////////////////////
+
+                pushButtonDown.pointerEnterAnimation = () => {
+                    buttonBodyDown.material = redMat;
+                };
+                pushButtonDown.pointerOutAnimation = () => {
+                    buttonBodyDown.material = buttonBodyDownMat;
+                };
+
+                // LONG PRESS REFERENCE : https://www.babylonjs-playground.com/#DXRQ3L#1
+
+                // ROLL OVER /////////////////////////////////////////////
+                // MOUSE ACTION ////////////////////////////////////
+
+                pushButtonDown.onPointerDownObservable.add(() => {
+                    console.log("Down pushed.");
+                    hl.addMesh(buttonBodyDown, BABYLON.Color3.Red());
+                    counterDisplay = _decrementCounter();
+                    textButton1info(counterDisplay);
+                });
+
+                pushButtonDown.onPointerUpObservable.add(() => {
+                    console.log("Down released.");
+                    hl.removeMesh(buttonBodyDown, BABYLON.Color3.Red());
+                });
+
+
+                panel.addControl(pushButtonDown);
+
+                panel.addControl(pushButtonUp);
+                pushButtonUp.position.x = -1.4; //  position.x = -1.4; // top button down to bottom button
+
+
+                
+                 
+            scene.onPointerDown = function (evt, pickResult) {
+                if (scene.getMaterialByName("myMaterial")) {
+                    scene.getMaterialByName("myMaterial").dispose();
+                }
+                //console.log("in scene.onPointerDown - evt " + evt);
+               // console.log("in scene.onPointerDown - pickResult " + pickResult);
+                // let hl = new BABYLON.HighlightLayer("hl1", scene);
+                 // store uniqueID of mesh so can remove hl layer
+                 let uniqueId = pickResult.pickedMesh.uniqueId;
+                 hl.addMesh(pickResult.pickedMesh, BABYLON.Color3.Red());
+                let myMaterial = new BABYLON.StandardMaterial("myMaterial", scene);
+               // myMaterial.diffuseColor = new BABYLON.Color3(1, 0, 1);
+               myMaterial.emissiveColor = new BABYLON.Color3(0.34, 0.34, 0.8);
+                pickResult.pickedMesh.material = myMaterial;
+            }
+
+            scene.onPointerUp = function (evt, pickResult) {
+                if (scene.getMaterialByName("myMaterial")) {
+                    scene.getMaterialByName("myMaterial").dispose();
+                }
+               // console.log("in scene.onPointerDown - evt " + evt);
+               // console.log("in scene.onPointerDown - pickResult " + pickResult);
+                // let hl = new BABYLON.HighlightLayer("hl1", scene);
+                let uniqueId = pickResult.pickedMesh.uniqueId;
+                hl.removeMesh(pickResult.pickedMesh, BABYLON.Color3.Red());
+               let myMaterial = new BABYLON.StandardMaterial("myMaterial", scene);
+               // myMaterial.diffuseColor = new BABYLON.Color3(1, 0, 1);
+               myMaterial.diffuseColor = new BABYLON.Color3(0.0, 0.64, 0.8);//0.5, 0.19, 0
+               myMaterial.specularColor = new BABYLON.Color3(1.0, 1.0, 1.0);
+                pickResult.pickedMesh.material = myMaterial;
+            }
+
+
+
+
+               
+            }
+
+// data /////////////////////////////////////////
+
+    
         /*     function saveData(user, pass) {
                 console.log("saveData called");
                     var account = {
@@ -160,721 +1026,7 @@
 
 
 
-
-
-
-        // data /////////////////////////////////////////
-
-        var displayValueTotal = function (value) {
-            // adjust value to single 1.0, 2.0 verses 1.67536757675, 2.037673567
-            // return BABYLON.Tools.ToDegrees(value) | 0;
-            //return (value | 10);
-            // value = (Math.round(value * 10) / 10); // (Math.round(value * 10) / 10);
-            value = (Math.floor(value));
-            three = value;
-            //console.log("three set to " + value + " in displayValueTotal");
-            return value;
-        }
-
-
-        //var createDefaultEngine = function () { return new BABYLON.Engine(canvas, true, { preserveDrawingBuffer: true, stencil: true,  disableWebGL2Support: false }); };
-        var createDefaultEngine = function () { return new BABYLON.Engine(canvas, true, { preserveDrawingBuffer: true, stencil: true }); };
-
-
-        var createScene = async function () {
-            var scene = new BABYLON.Scene(engine);
-            scene.clearColor = new BABYLON.Color3(.5, .5, .5);
-        //    var camera = new BABYLON.ArcRotateCamera("camera", 1 * Math.PI / 3, Math.PI / 2.5, 100, BABYLON.Vector3.Zero(), scene);
-        //const camera = new BABYLON.ArcRotateCamera("camera", Math.PI / 2, Math.PI / 2, 4, BABYLON.Vector3.Zero(), scene);
-        const camera = new BABYLON.ArcRotateCamera("camera",0.0, 1.0, 8,BABYLON.Vector3.Zero(),scene);
-            camera.setTarget(BABYLON.Vector3.Zero());
-
-     camera.attachControl(canvas, true);
-     camera.lowerRadiusLimit = 5;
-    camera.upperRadiusLimit = 30;
-
-
-/*             var light = new BABYLON.DirectionalLight("dir02", new BABYLON.Vector3(0.2, -1, 0), scene);
-            light.position = new BABYLON.Vector3(1.527, -12.032, -160.606);// (-76.104, -12.032, -96.969);
-            light.direction = new BABYLON.Vector3(0.081, 0.898, -0.433); // (0.191, -0.953, 0.233);
-            //light.direction = new BABYLON.Vector3(0.0, 1.0, 0.0);
-            light.intensity = 0.6;// 0.6 */
-
-            var light = new BABYLON.HemisphericLight("sun", new BABYLON.Vector3(0,1,0), scene);
-
-
-
-            // GUI - //
-            var loadSelectionPanel = function () {
-
-                /*                 var toSize = function (isChecked) {
-                                    if (isChecked) {
-                                        box.scaling = new BABYLON.Vector3(0.5, 0.5, 0.5);
-                                    }
-                                    else {
-                                        box.scaling = new BABYLON.Vector3(1, 1, 1);
-                                    }
-                                } */
-
-                /*                 var toPlace = function (isChecked) {
-                                    if (isChecked) {
-                                        box.position.y = 1.5;
-                                    }
-                                    else {
-                                        box.position.y = 0.5;
-                                    }
-                                } */
-
-                /*        var setColor = function (but) {
-                           switch (but) {
-                               case 0:
-                                   box.material = blueMat;
-                                   break
-                               case 1:
-                                   box.material = redMat;
-                                   break
-                           }
-                       } */
-
-                /* var boxSlider = BABYLON.MeshBuilder.CreateBox("boxSlider", {}, scene);
-                boxSlider.position.x = 8.0;
-                boxSlider.position.y = 1.0;
-                boxSlider.position.z = 2.5; */
-
-                /*                 var orientateY = function (angle) {
-                                    boxSlider.rotation.y = angle;
-                                    boxSlider.rotation.x = angle;
-                                } */
-
-
-
-
-
-                var advancedTexture = BABYLON.GUI.AdvancedDynamicTexture.CreateFullscreenUI("UImenu");
-               // advancedTexture.rootContainer.scaleX = window.devicePixelRatio;
-              //  advancedTexture.rootContainer.scaleY = window.devicePixelRatio;
-
-                // number of blocks
-                var totalValue = new BABYLON.GUI.SliderGroup("Height", "S");
-                totalValue.zIndex = 3;
-                totalValue.horizontalAlignment = BABYLON.GUI.Control.HORIZONTAL_ALIGNMENT_CENTER;
-                totalValue.verticalAlignment = BABYLON.GUI.Control.VERTICAL_ALIGNMENT_CENTER;
-                totalValue.addSlider("Total Blocks", setTotalBlocks, " ", 6, 84, 30, displayValueTotal)
-                totalValue.width = '90%';
-                // number of blocks
-
-                 // friction
-                 var totalFriction = new BABYLON.GUI.SliderGroup("Friction", "S");
-                totalFriction.zIndex = 3;
-                totalFriction.horizontalAlignment = BABYLON.GUI.Control.HORIZONTAL_ALIGNMENT_CENTER;
-                totalFriction.verticalAlignment = BABYLON.GUI.Control.VERTICAL_ALIGNMENT_CENTER;
-                totalFriction.addSlider("Force between bodies", setTotalFriction, " ", 6, 84, 30, displayValueTotal)
-                totalFriction.width = '90%';
-                // friction
-
-                 // mass
-                 var totalMass = new BABYLON.GUI.SliderGroup("Mass", "S");
-                totalMass.zIndex = 3;
-                totalMass.horizontalAlignment = BABYLON.GUI.Control.HORIZONTAL_ALIGNMENT_CENTER;
-                totalMass.verticalAlignment = BABYLON.GUI.Control.VERTICAL_ALIGNMENT_CENTER;
-                totalMass.addSlider("Total Matter", setTotalMass, " ", 6, 84, 30, displayValueTotal)
-                totalMass.width = '90%';
-                // mass
-
-
-
-
-
-
-
-                /*              TextBlock       Property	    Type	`Comments
-                                lineSpacing(0px)	valueAndUnit	        Can be set to configure vertical spacing between text lines
-                                text(null)	    string	    Text to display
-                                textWrapping(false)	boolean             	Can be set to true to enable text wrapping.
-                                resizeToFit(false)	boolean	                Can be set to true to enable resize to fit.
-                                textHorizontalAlignment(2)	number	        Can be set to left, right or center
-                                textVerticalAlignment(2)	number	        Can be set to top, bottom or center
-                                outlineWidth(0)	number	                    Text outline size, in pixels.
-                                outlineColor("white")	string	            Text outline color.
-                                wordSplittingFunction	string	            Function to use to split the text into words
-                               
-                                The control currently provides 1 observable:
-                                Observables	Comments
-                                onTextChangedObservable	Raised when the text has changed */
-
-
-                var panel = new BABYLON.GUI.SelectionPanel("panel");
-                panel.fontSize = 20;
-                panel.width = 0.35;//   0.25;
-                panel.height = 0.40;//0.25;
-                panel.thickness = 4;
-                panel.horizontalAlignment = BABYLON.GUI.Control.HORIZONTAL_ALIGNMENT_CENTER;
-                panel.verticalAlignment = BABYLON.GUI.Control.VERTICAL_ALIGNMENT_CENTER;
-                panel.zIndex = 1;
-                /* Change Color Scheme  */
-                panel.color = "orange";// blue
-                panel.background = "#336699"; // "#0394fc"
-                panel.barColor = "orange"; // "#4F7DF2"
-                panel.headerColor = "white";
-                panel.buttonColor = "orange";
-                panel.buttonBackground = "#684502"
-                panel.isVertical = true;
-
-
-                // Babylon.js playground reference  https://playground.babylonjs.com/#BXMTCD#2
-
-
-                advancedTexture.addControl(panel);
-
-                /*(method) BABYLON.GUI.CheckboxGroup.addCheckbox(text: string, func?: (s: boolean) => void, checked?: boolean): void
-                Adds a checkbox as a control
-                @param - text is the label for the selector
-                @param - func is the function called when the Selector is checked
-                @param - checked is true when Selector is checked */
-
-
-
-
-                //            var spacerGroup1 = new BABYLON.GUI.CheckboxGroup("");
-               //             spacerGroup1.height = '200px';
-                //            var spacerGroup2 = new BABYLON.GUI.CheckboxGroup("");
-                // ------              transformGroup.addCheckbox("Small", );
-                // ------              transformGroup.addCheckbox("High", ); 
-
-
-                /* 
-                                (method) BABYLON.GUI.RadioGroup.addRadio(label: string, func?: (n: number) => void, checked?: boolean): void
-                                Adds a radio button as a control
-                
-                                @param - label is the label for the selector
-                                @param - func is the function called when the Selector is checked
-                                @param - checked is true when Selector is checked */
-
-                //var colorGroup = new BABYLON.GUI.RadioGroup("");
-                //colorGroup.addRadio("Play",setData);
-                //colorGroup.addRadio("Red", );
-                //colorGroup.addRadio("", );
-
-
-                /*                 var createLabel = function (mesh) { // follows mesh
-                                    var label = new BABYLON.GUI.Rectangle("label for " + mesh.name);
-                                    label.background = "black"
-                                    label.height = "30px";
-                                    //label.alpha = 0.5;
-                                    label.width = "100px";
-                                    label.cornerRadius = 20;
-                                    label.thickness = 1;
-                                    label.linkOffsetY = 30;
-                                    advancedTexture.addControl(label);
-                                    label.linkWithMesh(mesh);
-                
-                                    var text1 = new BABYLON.GUI.TextBlock();
-                                    text1.text = mesh.name;
-                                    text1.color = "white";
-                                    label.addControl(text1);
-                
-                                    return label;
-                                } */
-
-                /*
-                (method) BABYLON.GUI.SliderGroup.addSlider(label: string, func?: (v: number) => void,
-                 unit?: string, min?: number, max?: number, value?: number, onValueChange?: (v: number) => number): void
-                   Adds a slider to the SelectorGroup
-                
-                 @param - label is the label for the SliderBar
-                 @param - func is the function called when the Slider moves
-                 @param - unit is a string describing the units used, eg degrees or metres
-                 @param - min is the minimum value for the Slider
-                 @param - max is the maximum value for the Slider
-                 @param - value is the start value for the Slider between min and max
-                 @param - onValueChange is the function used to format the value displayed, eg radians to degrees
-                 */
-         //       var totalValue = new BABYLON.GUI.SliderGroup("Height", "S");
-         //       totalValue.addSlider("Total Blocks", setTotalBlocks, " ", 6, 84, 30, displayValueTotal)
-
-
-                /*                 button = BABYLON.GUI.Button.CreateSimpleButton('btn', 'Button');
-                                button.horizontalAlignment = BABYLON.GUI.Control.HORIZONTAL_ALIGNMENT_LEFT;
-                                button.verticalAlignment = BABYLON.GUI.Control.VERTICAL_ALIGNMENT_TOP;
-                                button.width = '100px';
-                                button.height = '50px';
-                                button.left = '30%';
-                                button.top = '30px'; */
-
-
-                // advancedTexture.rootContainer.scaleX = window.devicePixelRatio;
-                // advancedTexture.rootContainer.scaleY = window.devicePixelRatio;
-
-/*                 var button1 = BABYLON.GUI.Button.CreateSimpleButton("but1", 'Hi there and greetings!');
-                button1.width = '250px';
-                button1.height = '30px';
-                button1.color = "black";
-                button1.fontSize = 20;
-                button1.thickness = 0;
-                button1.background = "white";
-                // advancedTexture.addControl(button1); */
-
-
-                /* 
-                // reference https://www.babylonjs-playground.com/#3VMTI9#4
-                                var slider = new BABYLON.GUI.Slider();
-                                // slider.verticalAlignment = BABYLON.GUI.Control.VERTICAL_ALIGNMENT_TOP;
-                                slider.minimum = 0;
-                                slider.maximum = 400;
-                                slider.color = "#faba3d";
-                                slider.background = "#e2e2e2";
-                                slider.value = 200;
-                                slider.height = "220px";
-                                slider.width = "300px";
-                                // slider.isVertical = true;
-                                // slider.onValueChangedObservable.add(function(value) {
-                                //     var zoomValue = 400-value;
-                                // });
-                                sliderPanel.addControl(slider);
-                                slider.rotation = -Math.PI / 2;
-                
-                
-                 */
-                //advancedTexture.addControl(button);
-
-// TITLE ////////////////////////////////////////////////
-
-                let loadTitle = function () {
-                var titleRectangle = new BABYLON.GUI.Rectangle('');
-                titleRectangle.width = 0.35;    //  .width = 0.35;
-                titleRectangle.height = .1;
-                titleRectangle.top = -285;// -285; 
-                titleRectangle.thickness = 4;
-                titleRectangle.color = "orange";
-                titleRectangle.background = "#336699";
-                titleRectangle.horizontalAlignment = BABYLON.GUI.Control.HORIZONTAL_ALIGNMENT_CENTER;
-                titleRectangle.verticalAlignment = BABYLON.GUI.Control.VERTICAL_ALIGNMENT_TOP;
-                advancedTexture.addControl(titleRectangle);
-
-                var title = new BABYLON.GUI.TextBlock();
-                title.color = "white";
-                title.outlineWidth = 5.6;
-                title.outlineColor = "black";
-                title.lineSpacing = 1;
-                title.textWrapping = true;
-                title.textHorizontalAlignment = 2;// 1 = right, 2 = center, 3 = left
-                title.textVerticalAlignment = 2;// 1 = bottom, 2 = center, 3 = ?
-                title.fontStyle = "italic";
-                title.fontFamily = "Verdana";
-                title.fontSize = 26;
-                // title.fontSize = "100%";
-                title.text = "Tumbling Tower";
-                titleRectangle.zIndex = 2;
-                titleRectangle.addControl(title);
-                title.onLinesReadyObservable.add(() => {
-                    var textHeight = (title.fontOffset.height) * title.lines.length;
-                    var ratioHeights = title.parent.heightInPixels / textHeight;
-                    var textWidth = title.lines[0].width;
-                    var ratioWidths = title.parent.widthInPixels / textWidth;
-                    if (ratioWidths < 1) {
-                        title.fontSize = parseFloat(title.fontSizeInPixels) * ratioWidths + "px";
-                    }
-                });
-            }
-
-// DIRECTIONS ////////////////////////////////////////////////
-
-                let loadDirections = function () { 
-                var directionsRectangle = new BABYLON.GUI.Rectangle('');
-                directionsRectangle.width = .35;    // .width = 0.35;
-                directionsRectangle.height = .10;//.10
-                directionsRectangle.top = -208;//-208; // go bigger negative number to move up
-                directionsRectangle.thickness = 4;
-                directionsRectangle.color = "orange";
-                advancedTexture.addControl(directionsRectangle);
-
-                var directions = new BABYLON.GUI.TextBlock();
-                directions.color = "white";
-                directions.outlineWidth = 5.6;
-                directions.outlineColor = "black";
-                directions.lineSpacing = 1;
-                directions.textWrapping = true;
-                directions.textHorizontalAlignment = 2;// 1 = right, 2 = center, 3 = left
-                directions.textVerticalAlignment = 2;// 1 = bottom, 2 = center, 3 = ?
-                directions.fontStyle = "italic";
-                directions.fontFamily = "Verdana";
-                directions.fontSize = 20;
-                // directions.fontSize = "100%";
-                directions.text = "Adjust Tower building settings";
-                directionsRectangle.zIndex = 2;
-                directionsRectangle.addControl(directions);
-                directions.onLinesReadyObservable.add(() => {
-                    var textHeight = (directions.fontOffset.height) * directions.lines.length;
-                    var ratioHeights = directions.parent.heightInPixels / textHeight;
-                    var textWidth = directions.lines[0].width;
-                    var ratioWidths = directions.parent.widthInPixels / textWidth;
-                    if (ratioWidths < 1) {
-                        directions.fontSize = parseFloat(directions.fontSizeInPixels) * ratioWidths + "px";
-                    }
-                });
-            }
-
-// SPACER ////////////////////////////////////////////////
-                
-/*                 var textGroup = new BABYLON.GUI.CheckboxGroup("spacer");
-                //  textGroup.TextBlock.color = "white";
-                 var textGroup = new BABYLON.GUI.TextBlock();
-                     textGroup.height = 0.70;
-                   //  textGroup.thickness = 0.7;
-                    var text1 = new BABYLON.GUI.TextBlock();
-                    text1.horizontalTextAlignment = BABYLON.GUI.Control.HORIZONTAL_ALIGNMENT_CENTER;
-                    text1.text = "Hello world";
-                //     textGroup.color = "#0394fc";
-                //    text1.fontSize = 14;
-                text1.zIndex = 2;
-                 advancedTexture.addControl(text1); 
- */
-
- 
-              //  var totalValueHolder = new BABYLON.GUI.TextBlock();
-              //  totalValueHolder.color = "white";
-              //  totalValueHolder.outlineWidth = 5.6;
-/*                directions.outlineColor = "black";
-                directions.lineSpacing = 1;
-                directions.textWrapping = true;
-                directions.textHorizontalAlignment = 2;// 1 = right, 2 = center, 3 = left
-                directions.textVerticalAlignment = 2;// 1 = bottom, 2 = center, 3 = ?
-                directions.fontStyle = "italic";
-                directions.fontFamily = "Verdana";
-                directions.fontSize = 20;
-                // directions.fontSize = "100%";
-                directions.text = "Adjust Tower building settings";
-                */
-               // loadTotalRectangle.zIndex = 2;
-
-             //   loadTotalRectangle.addControl(totalValue);
-                /*
-                directions.onLinesReadyObservable.add(() => {
-                    var textHeight = (directions.fontOffset.height) * directions.lines.length;
-                    var ratioHeights = directions.parent.heightInPixels / textHeight;
-                    var textWidth = directions.lines[0].width;
-                    var ratioWidths = directions.parent.widthInPixels / textWidth;
-                    if (ratioWidths < 1) {
-                        directions.fontSize = parseFloat(directions.fontSizeInPixels) * ratioWidths + "px";
-
-
-                    }
-                }); 
-                */
-
-
-
-
-                // console.log("@@@@@@@@@@@ value @@@@@@@@@@@@ " + value);
-                // impulseMagnitude = impulseMagnitudeSliderValue;
-                //     advancedTexture.addControl(title); // title
-                // panel.addControl(title);
-loadTitle();
-loadDirections();
-
-                panel.addGroup(totalValue); // total block count >> move by changing panel height
-                panel.addGroup(totalFriction);
-                panel.addGroup(totalMass);
-                
-                //    advancedTexture.addControl(button);
-                //    advancedTexture.addControl(button1);
-                //   panel.addGroup(button); // shows if just above line, but not current.
-
-
-                var setTotalBlocks = function (value) {
-                    // sets the blocks count based on value
-                    crateCountTotalGoal = value;
-                    //console.log("setImpulse value " + value );
-                    return crateCountTotalGoal;
-                }
-
-                var setTotalFriction = function (value) {
-                    // sets the friction based on value
-                  //  crateCountTotalGoal = value;
-                    //console.log("setImpulse value " + value );
-                 //   return crateCountTotalGoal;
-                }
-
-                var setTotalMass = function (value) {
-                    // sets the mass based on value
-                  //  crateCountTotalGoal = value;
-                    //console.log("setImpulse value " + value );
-                 //   return crateCountTotalGoal;
-                }
-            }
-
-            let const3Dmenu = function ()   {
-                var anchor = new BABYLON.TransformNode("");
-                camera.attachControl(canvas, true);
-                // Create the 3D UI manager
-                var manager = new BABYLON.GUI.GUI3DManager(scene);
-
-                var panel = new BABYLON.GUI.CylinderPanel();
-                panel.margin = 0.75;
-
-                manager.addControl(panel);
-                panel.linkToTransformNode(anchor);
-              //  panel.position.z = -1.5;
-
-                // The first parameter can be used to specify which mesh to import. Here we import all meshes
-                BABYLON.SceneLoader.ImportMesh("", "https://david.blob.core.windows.net/babylonjs/MRTK/", "pushButton.glb", scene, function (newMeshes) {
-            //        pushButtonCore = newMeshes[0];
-           //         makePushButtons();
-            //        pushButtonCore.setEnabled(false);
-                });
-
-
-                
-/*     function makePushButton(mesh, hoverColor) {
-        var cylinder = mesh.getChildMeshes(false, (node) => { return node.name.indexOf("Cylinder") !== -1 })[0];
-        var cylinderMat = cylinder.material.clone();
-        cylinderMat.albedoColor = new BABYLON.Color3(0.5, 0.19, 0);
-        cylinder.material = cylinderMat;
-
-        var pushButton = new BABYLON.GUI.MeshButton3D(mesh, "pushButton" + index);
-        pushButton.pointerEnterAnimation = () => {
-            cylinder.material.albedoColor = hoverColor;
-        };
-        pushButton.pointerOutAnimation = () => {
-             cylinder.material.albedoColor = new BABYLON.Color3(0.5, 0.19, 0);
-        };
-        pushButton.pointerDownAnimation = () => {
-            cylinder.position.y = 0;
-        }
-        pushButton.pointerUpAnimation = () => {
-            cylinder.position.y = 0.21;
-        }
-        pushButton.onPointerDownObservable.add(() => {
-            console.log(pushButton.name + " pushed.");
-        });
-        panel.addControl(pushButton);
-        index++;
-    } */
-
-    function makePushButtons() {
-        var color;
-        var newPushButton;
-        var colors = [{r: 0.25, g:0, b:0}, {r: 0, g:0.25, b:0}, {r: 0, g:0, b:0.25},
-                      {r: 0.25, g:0.25, b:0}, {r: 0, g:0.25, b:0.25}, {r: 0.25, g:0, b:0.25}];
-
-        panel.blockLayout = true;
-        for (var i = 0; i < 10; i++) {
-            newPushButton = pushButtonCore.clone("pushButton" + index);
-            color = new BABYLON.Color3(colors[i % 6].r, colors[i % 6].g, colors[i % 6].b);
-            makePushButton(newPushButton, color);
-        }
-        panel.blockLayout = false;
-    }
-    }
-        
-let _set3dMeshMenu = function() {
-    var anchor = new BABYLON.TransformNode("transformNode");
-    var manager = new BABYLON.GUI.GUI3DManager(scene);
-   // var panel = new BABYLON.GUI.CylinderPanel();
-  var panel = new BABYLON.GUI.StackPanel3D();
-
-   // REFERENCE https://doc.babylonjs.com/divingDeeper/gui/gui3D#gui3dmanager
-
- //   panel.margin = 0.75;
- manager.addControl(panel);
- //   panel.linkToTransformNode(anchor);
-              //  panel.position.z = -1.5;
-
-/*     (method) BABYLON.MeshBuilder.CreateCylinder(name: string, options: {
-        height?: number;
-        diameterTop?: number;
-        diameterBottom?: number;
-        diameter?: number;
-        tessellation?: number;
-        subdivisions?: number;
-        arc?: number;
-        faceColors?: BABYLON.Color4[];
-        ... 7 more ...;
-        backUVs?: BABYLON.Vector4;
-    }, scene ?: BABYLON.Scene): BABYLON.Mesh */
-
-/*     (method) BABYLON.MeshBuilder.CreateTube(name: string, options: {
-        path: BABYLON.Vector3[];
-        radius?: number;
-        tessellation?: number;
-        radiusFunction?: (i: number, distance: number) => number;
-        cap?: number;
-        arc?: number;
-        updatable?: boolean;
-        ... 4 more ...;
-        invertUV?: boolean;
-    }, scene ?: BABYLON.Scene): BABYLON.Mesh */
-
-// maybe update button with : REFERENCE (die as in pair of dice, face):
-/* let text = "4";
-let color = "blue";
-let size = 1.5;
-var makeTextPlane = function(text, color, size) {
-        var dynamicTexture = new BABYLON.DynamicTexture("DynamicTexture", 50, scene, true);
-        dynamicTexture.hasAlpha = true;
-        dynamicTexture.drawText(text, 5, 40, "bold 36px Arial", color , "transparent", true);
-        var plane = new BABYLON.Mesh.CreatePlane("TextPlane", size, scene, true);
-        plane.material = new BABYLON.StandardMaterial("TextPlaneMaterial", scene);
-        plane.material.backFaceCulling = false;
-        plane.material.specularColor = new BABYLON.Color3(0, 0, 0);
-        plane.material.diffuseTexture = dynamicTexture;
-        plane.rotation.y = 250.0;
-       // plane.rotation.x = 10.0;
-        return plane;
-    }; 
-
-makeTextPlane(text, color, size);
-
- */
-
-    //  material
-
-    let buttonBodyDownMaterial = new BABYLON.StandardMaterial("buttonBodyDownMaterial", scene);
-    buttonBodyDownMaterial.diffuseColor = new BABYLON.Color3(0, 0.64, 0.8);//0.5, 0.19, 0
-    buttonBodyDownMaterial.specularColor = new BABYLON.Color3(1.0, 1.0, 1.0);
-
-    let buttonBodyUpMaterial = new BABYLON.StandardMaterial("buttonBodyUpMaterial", scene);
-    buttonBodyUpMaterial.diffuseColor = new BABYLON.Color3(0, 0.64, 0.8);//0.5, 0.19, 0
-    buttonBodyUpMaterial.specularColor = new BABYLON.Color3(1.0, 1.0, 1.0);
-
-    let hoverColor = new BABYLON.StandardMaterial("hoverColor", scene);
-    hoverColor.diffuseColor = new BABYLON.Color3(0.95, 0.91, 0.36);
-    hoverColor.specularColor = new BABYLON.Color3(1.0, 1.0, 1.0);
-    hoverColor.emissiveColor = new BABYLON.Color3(1,1,1);
-
-    let backgroundMaterial = new BABYLON.StandardMaterial("buttonCoreMaterial", scene);
-    backgroundMaterial.diffuseColor = new BABYLON.Color3(0.27, 0.11, 0.11, 0.88);
-    backgroundMaterial.specularColor = new BABYLON.Color3(1.0, 1.0, 1.0);
-
-    var redMat = new BABYLON.StandardMaterial("red", scene);
-    redMat.emissiveColor = new BABYLON.Color3(1,0,0); // (1,0,0)
-
-//  material
-
-
-
-
-
-
-
-
-
-
-    // buttons 
-    const buttonBodyDown = BABYLON.MeshBuilder.CreateCylinder("buttonBodyDown", { // TRY TUBE
-        height:  0.2,
-        diameterTop: 0.70,
-        tessellation: 3,
-        diameter: 2.5
-    },scene);
-    buttonBodyDown.position.x = 0.0;
-    buttonBodyDown.position.y = 0.0;
-    buttonBodyDown.position.z = 0.0;
-   buttonBodyDown.material = buttonBodyDownMaterial;
-
-   const buttonBodyUp = BABYLON.MeshBuilder.CreateCylinder("buttonBodyUp", { // TRY TUBE
-        height:  0.2,
-        diameterTop: 0.70,
-        tessellation: 3,
-        diameter: 2.5
-    },scene);
-    buttonBodyUp.position.x = 0.0;
-    buttonBodyUp.position.y = 0.0;
-    buttonBodyUp.position.z = 0.0;
-    buttonBodyUp.rotation.y = 45.0;
-    buttonBodyUp.material = buttonBodyUpMaterial;
-
- 
-
- 
-// buttons
-
-    // Group button parts
-
-    //create parent object 
-/*     var parentObj = BABYLON.MeshBuilder.CreateBox('parent', { size: 0.5 }, scene);
-    var midNode = new BABYLON.TransformNode("midNode");
-    midNode.parent = parentObj;
-    //child object 1
-    var childObj1 = BABYLON.MeshBuilder.CreateSphere("sphere1", { diameter: 0.5, segments: 32 }, scene);
-    //positioning is coming from an external file, I can scale down the entire group 
-    //I want to take the center of the grouping and place it on 0,0,0
-   // childObj1.position.x = 25;
-   // childObj1.position.z = 25;
-   childObj1.position.y = 0.45;
-   // childObj1.parent = midNode;
- */
-// Group button parts
-
-
-
-/*     constructor BABYLON.GUI.MeshButton3D(mesh: BABYLON.Mesh, name ?: string): BABYLON.GUI.MeshButton3D
-    Creates a new 3D button based on a mesh
-    @param - mesh mesh to become a 3D button
-    @param - name defines the control name
- */
-
- let pushButtonDown = new BABYLON.GUI.MeshButton3D(buttonBodyDown, "buttonBodyDown");
- let pushButtonUp = new BABYLON.GUI.MeshButton3D(buttonBodyUp, "buttonBodyUp");
-
-
-
- let buttonBodyDownMat = buttonBodyDown.material.clone();
- let buttonBodyUpMat = buttonBodyUp.material.clone();
- //buttonBodyMat.albedoColor = new BABYLON.Color3(0.5, 0.19, 0);
-// buttonBodyDown.material = buttonBodyDownMat;
- buttonBodyUp.material = buttonBodyUpMat;
-
-       
-
-        pushButtonUp.pointerOutAnimation = () => {
-            buttonBodyUp.material = buttonBodyUpMat;
-        };
-
-         pushButtonUp.pointerEnterAnimation = () => {
-           buttonBodyUp.material = redMat;//  hoverColor
-        }; 
-
-        pushButtonDown.pointerOutAnimation = () => {
-            buttonBodyDown.material = buttonBodyDownMat;
-        };
-
-         pushButtonDown.pointerEnterAnimation = () => {
-           buttonBodyDown.material = redMat;
-        }; 
-
-        
-        
-
-
-
-
-
-
-    panel.addControl(pushButtonDown);
-    panel.addControl(pushButtonUp);
-   //pushButtonUp.rotation.x = 90;
-
-        pushButtonUp.position.x = -1.4; //  position.x = --1.2;
-
-   //manager.addControl(pushButton);
-    //    pushButton.linkToTransformNode(anchor);
-
-    //    panel.addControl(pushButtonBody);
-    //    pushButtonBody.linkToTransformNode(anchor);
-        
-        //buttonCore1.position.z = -0.891;
-       // buttonCore1.position.z = -0.891;
-
-let background = BABYLON.MeshBuilder.CreateBox("background", {width: 10, height: 0.5, depth: 5 }, scene)
-background.material = backgroundMaterial;
-    background.position.x = 0.0;
-    background.position.y = -0.329;
-    background.position.z = 0.0;
-
-}
-
-
+            // LOCAL STORAGE //////////////////////////////////////////////////////
             function setData() {
                 // (A) VARIABLES TO PASS
                 console.log("////////// setData called //////////");
@@ -895,25 +1047,13 @@ background.material = backgroundMaterial;
                 // window.open("index.html _self");
                 window.open('index.html', '_self', false)
                 //location.href = "2b-local-storage.html";
+// data /////////////////////////////////////////
             }
 
-// --- scene.debugLayer.show();
-//            loadSelectionPanel();
-//const3Dmenu();
-_set3dMeshMenu();
-// Reference 3D push button : https://playground.babylonjs.com/#8Y780Y#20
-            //   saveData("Paul", "password");
+scene.debugLayer.show();
 
-
-            /* button.actionManager = new BABYLON.ActionManager(scene);
-    
-    button.actionManager.registerAction(
-           new BABYLON.ExecuteCodeAction(BABYLON.ActionManager.OnPickTrigger,function(event){
-               var pickedMesh = event.meshUnderPointer; 
-   
-               window.open("http://doc.babylonjs.com/");
-           })
-       ); */
+            _set3dMeshMenu();
+            GUIslider();
 
 
 
